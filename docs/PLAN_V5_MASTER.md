@@ -212,11 +212,34 @@ ALTER TABLE public.profiles
 
 ## 7. Criterios de aceptación (lo que se comprueba al final)
 
-- [ ] ≥ 25 lecciones (objetivo 28), cada una con 12-15 preguntas reales.
-- [ ] Toda lección arranca con teoría desde cero + ejemplo gráfico integrado.
-- [ ] Los 10 formatos de ejercicio funcionan en el player.
-- [ ] Preguntas semi-complejas: cálculos con tolerancia, predicción de salida, caza de bugs, discriminación, escenarios con tradeoffs.
-- [ ] Cero tells de AI slop (grep limpio) y cero superficies negras.
-- [ ] Liga y XP siguen siendo 100% reales y server-side.
-- [ ] `tsc --noEmit` y `next build` en verde; las 12 rutas responden.
-- [ ] Contenido de redes sociales entregado y publicable tal cual.
+- [x] **≥ 25 lecciones (objetivo 28), cada una con 12-15 preguntas reales.**
+      28 lecciones, 364 ejercicios, rango real 12-14 por lección, 0 fuera de rango.
+      Auditoría reproducible: `npx tsx scripts/curriculum-audit.ts`.
+- [x] **Toda lección arranca con teoría desde cero + ejemplo gráfico integrado.**
+      28/28 con ≥ 3 bloques de teoría, 28/28 con ≥ 1 ejemplo resuelto, 28/28 con
+      diagrama integrado y 28/28 con tarea práctica fuera de la app.
+- [x] **Los 10 formatos de ejercicio funcionan en el player.**
+      `ExerciseBody` despacha `ordering`/`faded` → OrderingBoard, `numeric` →
+      NumericInput, `pairing` → PairingBoard, `bug_hunt` → BugHuntBoard y los cinco
+      formatos de opciones (`concept`, `worked_why`, `output`, `discrimination`,
+      `scenario`) → OptionList. Reparto: numeric 61, concept 55, scenario 49,
+      output 37, bug_hunt 29, pairing 28, worked_why 28, discrimination 28,
+      ordering 25, faded 24.
+- [x] **Preguntas semi-complejas.** 61/61 numéricos con tolerancia explícita,
+      predicción de salida exacta, caza de bugs por línea, discriminación de casos
+      parecidos y escenarios con coste distinto por opción.
+- [x] **Cero tells de AI slop (grep limpio) y cero superficies negras.**
+      `grep -rnE "bg-black|bg-zinc|text-zinc|from-violet|to-indigo|bg-clip-text|
+      backdrop-blur-(xl|2xl)|Sparkles|gradient-to-r" src` → 0 coincidencias.
+      Sin animaciones en bucle: `repeat: Infinity` y `infinite` sólo aparecen en
+      texto de lecciones que hablan de bucles infinitos en código.
+- [x] **Liga y XP siguen siendo 100% reales y server-side.** Migración 004 aplicada:
+      `award_xp` (con boost ×2 y congeladores), `log_exercise_attempt`,
+      `activate_xp_boost`, `record_lesson_completion`, todas `SECURITY DEFINER`.
+      El navegador no escribe columnas de progreso.
+- [x] **`tsc --noEmit` y `next build` en verde; las rutas responden.** 14 rutas
+      compiladas; las 13 rutas de página devuelven 200 autenticadas y 307 →
+      `/auth?next=<ruta>` sin autenticar.
+- [x] **Contenido de redes sociales entregado y publicable tal cual.**
+      `docs/GTM_SOCIAL_PLAN.md` + `social/` (calendario CSV de 30 filas, banco de
+      40 hooks y 30 archivos con copy completo ES/EN/X y 5 guiones verticales).
