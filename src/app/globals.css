@@ -1,0 +1,332 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   LEVELUP · Bright Arcade system
+   Light, vibrant, tactile. Hard 4px "lips" instead of soft glows.
+   ========================================================================== */
+
+:root {
+  --paper: #ffffff;
+  --polar: #f7f7f7;
+  --swan: #e5e5e5;
+  --hare: #afafaf;
+  --wolf: #777777;
+  --eel: #4b4b4b;
+  --graphite: #3c3c3c;
+  --navy: #042c60;
+
+  --ecto: #58cc02;
+  --ecto-dark: #58a700;
+  --ecto-mask: #89e219;
+  --ecto-wash: #d7ffb8;
+
+  --macaw: #1cb0f6;
+  --macaw-dark: #1899d6;
+  --macaw-wash: #ddf4ff;
+
+  --cardinal: #ff4b4b;
+  --cardinal-dark: #ea2b2b;
+  --cardinal-wash: #ffdfe0;
+
+  --bee: #ffc800;
+  --bee-dark: #e5a800;
+  --bee-wash: #fff4cc;
+
+  --fox: #ff9600;
+  --fox-dark: #d97b00;
+  --fox-wash: #ffe8cc;
+
+  --lip: var(--swan);
+}
+
+* {
+  border-color: var(--swan);
+}
+
+html,
+body {
+  background-color: var(--paper);
+  color: var(--eel);
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--ecto-wash);
+  color: var(--navy);
+}
+
+/* Focus ring: chunky and visible, never a soft glow */
+:focus-visible {
+  outline: 3px solid var(--macaw);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   Tactile 3D "lip" system
+   -------------------------------------------------------------------------- */
+.lip {
+  box-shadow: 0 4px 0 0 var(--lip);
+  transition: transform 90ms ease-out, box-shadow 90ms ease-out, filter 120ms ease-out;
+}
+
+.lip:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 0 var(--lip);
+}
+
+.lip:disabled {
+  filter: saturate(0.35) opacity(0.6);
+  cursor: not-allowed;
+}
+
+.lip-sm {
+  box-shadow: 0 2px 0 0 var(--lip);
+  transition: transform 90ms ease-out, box-shadow 90ms ease-out;
+}
+
+.lip-sm:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 0 var(--lip);
+}
+
+.lip-ecto {
+  --lip: var(--ecto-dark);
+}
+.lip-macaw {
+  --lip: var(--macaw-dark);
+}
+.lip-cardinal {
+  --lip: var(--cardinal-dark);
+}
+.lip-bee {
+  --lip: var(--bee-dark);
+}
+.lip-fox {
+  --lip: var(--fox-dark);
+}
+.lip-swan {
+  --lip: var(--swan);
+}
+.lip-navy {
+  --lip: #032048;
+}
+
+/* Primary call to action — uppercase, heavy, pressable */
+.btn-arcade {
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-sm font-extrabold uppercase tracking-[0.06em] text-paper select-none;
+  background-color: var(--ecto);
+  --lip: var(--ecto-dark);
+  box-shadow: 0 4px 0 0 var(--lip);
+  transition: transform 90ms ease-out, box-shadow 90ms ease-out, filter 120ms ease-out;
+}
+
+.btn-arcade:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.btn-arcade:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+.btn-arcade:disabled {
+  background-color: var(--swan);
+  color: var(--hare);
+  --lip: #d4d4d4;
+  box-shadow: 0 4px 0 0 var(--lip);
+  cursor: not-allowed;
+}
+
+.btn-macaw {
+  background-color: var(--macaw);
+  --lip: var(--macaw-dark);
+}
+
+.btn-ghost {
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-swan bg-paper px-6 py-3.5 text-sm font-extrabold uppercase tracking-[0.06em] text-wolf select-none;
+  --lip: var(--swan);
+  box-shadow: 0 4px 0 0 var(--lip);
+  transition: transform 90ms ease-out, box-shadow 90ms ease-out, color 120ms ease-out, border-color 120ms ease-out;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  color: var(--macaw);
+  border-color: var(--macaw);
+}
+
+.btn-ghost:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+   Surfaces & panels
+   -------------------------------------------------------------------------- */
+.panel {
+  @apply rounded-2xl border-2 border-swan bg-paper;
+}
+
+.panel-polar {
+  @apply rounded-2xl border-2 border-swan bg-polar;
+}
+
+.inset-well {
+  box-shadow: inset 0 2px 0 0 rgba(0, 0, 0, 0.04);
+}
+
+/* Playful dotted field used behind the path (light, never a dark blob) */
+.bg-confetti-dots {
+  background-image: radial-gradient(circle at center, rgba(88, 204, 2, 0.16) 1.6px, transparent 1.7px);
+  background-size: 26px 26px;
+}
+
+.bg-swan-dots {
+  background-image: radial-gradient(circle at center, rgba(75, 75, 75, 0.09) 1.4px, transparent 1.5px);
+  background-size: 22px 22px;
+}
+
+/* --------------------------------------------------------------------------
+   Progress bars (16px tall, rounded, with a specular stripe)
+   -------------------------------------------------------------------------- */
+.progress-track {
+  @apply h-4 w-full overflow-hidden rounded-full bg-swan;
+  box-shadow: inset 0 2px 0 0 rgba(0, 0, 0, 0.05);
+}
+
+.progress-fill {
+  @apply h-full rounded-full;
+  background-color: var(--ecto);
+  position: relative;
+  transition: width 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 8px;
+  right: 8px;
+  height: 4px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.42);
+}
+
+/* --------------------------------------------------------------------------
+   Path nodes
+   -------------------------------------------------------------------------- */
+.path-node {
+  @apply relative flex items-center justify-center rounded-full;
+  border: none;
+  transition: transform 90ms ease-out, box-shadow 90ms ease-out, filter 120ms ease-out;
+}
+
+.path-node:active:not(:disabled) {
+  transform: translateY(6px);
+  box-shadow: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   Keyboard hints & inputs
+   -------------------------------------------------------------------------- */
+.kbd-key {
+  @apply inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-md border-2 border-swan bg-polar px-1.5 font-mono text-[11px] font-bold text-wolf;
+  box-shadow: 0 2px 0 0 var(--swan);
+}
+
+.field-arcade {
+  @apply w-full rounded-2xl border-2 border-swan bg-paper px-4 py-3.5 text-sm font-semibold text-graphite placeholder:font-medium placeholder:text-hare;
+  transition: border-color 140ms ease-out, box-shadow 140ms ease-out;
+}
+
+.field-arcade:focus {
+  outline: none;
+  border-color: var(--macaw);
+  box-shadow: 0 0 0 4px var(--macaw-wash);
+}
+
+.field-arcade.is-invalid {
+  border-color: var(--cardinal);
+  box-shadow: 0 0 0 4px var(--cardinal-wash);
+}
+
+/* --------------------------------------------------------------------------
+   Range input (used in the workbench calculators)
+   -------------------------------------------------------------------------- */
+.precision-slider {
+  @apply h-3 w-full cursor-pointer appearance-none rounded-full bg-swan;
+}
+
+.precision-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 26px;
+  width: 26px;
+  border-radius: 9999px;
+  background: var(--ecto);
+  border: 3px solid var(--paper);
+  box-shadow: 0 3px 0 0 var(--ecto-dark);
+  cursor: grab;
+}
+
+.precision-slider::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 0 var(--ecto-dark);
+}
+
+.precision-slider::-moz-range-thumb {
+  height: 22px;
+  width: 22px;
+  border-radius: 9999px;
+  background: var(--ecto);
+  border: 3px solid var(--paper);
+  box-shadow: 0 3px 0 0 var(--ecto-dark);
+}
+
+/* --------------------------------------------------------------------------
+   Scrollbars
+   -------------------------------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--polar);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--swan);
+  border-radius: 9999px;
+  border: 3px solid var(--polar);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--hare);
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@layer utilities {
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
