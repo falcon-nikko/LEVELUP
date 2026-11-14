@@ -38,6 +38,14 @@ export interface OperatorState {
   completedLessonSlugs: string[];
   completedMissionIds: string[];
   claimedQuestKeys: string[];
+  /** Spaced-repetition ledger: `lessonSlug#exerciseId` for every live mistake. */
+  mistakeKeys: string[];
+  /** Lessons finished with 100% first-try accuracy. */
+  legendarySlugs: string[];
+  lessonsCompletedCount: number;
+  streakFreezes: number;
+  /** ISO timestamp until XP is doubled, or null. */
+  xpBoostUntil: string | null;
   activityDates: string[];
   minutesPracticed: number;
   minutesStudiedToday: number;
@@ -69,6 +77,11 @@ const EMPTY_STATE: OperatorState = {
   completedLessonSlugs: [],
   completedMissionIds: [],
   claimedQuestKeys: [],
+  mistakeKeys: [],
+  legendarySlugs: [],
+  lessonsCompletedCount: 0,
+  streakFreezes: 0,
+  xpBoostUntil: null,
   activityDates: [],
   minutesPracticed: 0,
   minutesStudiedToday: 0,
@@ -98,6 +111,11 @@ type ProfileRow = {
   claimed_quest_slugs: string[] | null;
   activity_dates: string[] | null;
   minutes_practiced: number | null;
+  mistake_keys: string[] | null;
+  legendary_slugs: string[] | null;
+  lessons_completed_count: number | null;
+  streak_freezes: number | null;
+  xp_boost_until: string | null;
 };
 
 function mapProfile(row: ProfileRow, streak: number, longest: number): OperatorState {
@@ -127,6 +145,12 @@ function mapProfile(row: ProfileRow, streak: number, longest: number): OperatorS
     completedLessonSlugs: row.completed_lesson_slugs ?? [],
     completedMissionIds: row.completed_mission_ids ?? [],
     claimedQuestKeys: row.claimed_quest_slugs ?? [],
+    mistakeKeys: row.mistake_keys ?? [],
+    legendarySlugs: row.legendary_slugs ?? [],
+    lessonsCompletedCount:
+      row.lessons_completed_count ?? (row.completed_lesson_slugs?.length ?? 0),
+    streakFreezes: row.streak_freezes ?? 0,
+    xpBoostUntil: row.xp_boost_until ?? null,
     activityDates: row.activity_dates ?? [],
     minutesPracticed: row.minutes_practiced ?? 0,
     showInLeague: true,
@@ -164,13 +188,25 @@ interface LevelUpContextValue {
     gems: number;
     hearts: number;
     streak: number;
+    streak_freezes: number;
+    boosted: boolean;
     rank: number;
   } | null>;
   completeLesson: (payload: {
     lessonSlug: string;
     xpEarned: number;
     durationMin: number;
+    /** True when no exercise was missed on the first try. */
+    perfect?: boolean;
   }) => Promise<void>;
+  /** Records one graded answer in the server-side mistake ledger. */
+  logExerciseAttempt: (payload: {
+    lessonSlug: string;
+    exerciseId: string;
+    correct: boolean;
+  }) => Promise<void>;
+  /** Spends 30 gems for `minutes` of double XP. */
+  activateXpBoost: (minutes?: number) => Promise<boolean>;
   completeActionMission: (payload: { missionId: string; xpBonus: number }) => Promise<boolean>;
   claimDailyQuest: (payload: { questKey: string; xpReward: number }) => Promise<boolean>;
   consumeHeart: () => Promise<number>;
@@ -414,6 +450,9 @@ export function LevelUpProvider({ children }: { children: React.ReactNode }) {
         hearts: number;
         streak: number;
         longest_streak: number;
+        streak_freezes: number;
+        boosted: boolean;
+        xp_boost_until: string | null;
         rank: number;
       };
 
@@ -425,6 +464,8 @@ export function LevelUpProvider({ children }: { children: React.ReactNode }) {
         hearts: result.hearts,
         streakDays: result.streak,
         longestStreak: Math.max(prev.longestStreak, result.longest_streak ?? result.streak),
+        streakFreezes: result.streak_freezes ?? prev.streakFreezes,
+        xpBoostUntil: result.xp_boost_until ?? null,
         leagueRank: result.rank,
         activityDates: Array.from(new Set([...prev.activityDates, todayIso()])),
         minutesPracticed: prev.minutesPracticed + durationMin,
@@ -439,26 +480,48 @@ export function LevelUpProvider({ children }: { children: React.ReactNode }) {
     [persistToday, supabase, user]
   );
 
+  /**
+   * Completion is written by `record_lesson_completion` (SECURITY DEFINER), not
+   * by a client-side column update: the slug ledger, the counter and the
+   * legendary bonus are all decided server-side.
+   */
   const completeLesson = useCallback(
     async ({
       lessonSlug,
       xpEarned,
       durationMin,
+      perfect = false,
     }: {
       lessonSlug: string;
       xpEarned: number;
       durationMin: number;
+      perfect?: boolean;
     }) => {
       if (!user) return;
+      const { data } = await supabase.rpc('record_lesson_completion', {
+        p_lesson_slug: lessonSlug,
+        p_perfect: perfect,
+      });
+
+      const recorded = data as {
+        completed_lesson_slugs: string[];
+        lessons_completed_count: number;
+        legendary_slugs: string[];
+        gems: number;
+        new_legendary: boolean;
+      } | null;
+
       setState((prev) => ({
         ...prev,
-        completedLessonSlugs: Array.from(new Set([...prev.completedLessonSlugs, lessonSlug])),
-      }));
-      await patchProfile({
-        completed_lesson_slugs: Array.from(
-          new Set([...state.completedLessonSlugs, lessonSlug])
+        completedLessonSlugs: Array.from(
+          new Set([...prev.completedLessonSlugs, ...(recorded?.completed_lesson_slugs ?? [lessonSlug])])
         ),
-      });
+        lessonsCompletedCount:
+          recorded?.lessons_completed_count ?? prev.completedLessonSlugs.length + 1,
+        legendarySlugs: recorded?.legendary_slugs ?? prev.legendarySlugs,
+        gems: recorded?.gems ?? prev.gems,
+      }));
+
       await awardXp({
         source: 'lesson',
         sourceId: lessonSlug,
@@ -466,7 +529,34 @@ export function LevelUpProvider({ children }: { children: React.ReactNode }) {
         durationMin,
       });
     },
-    [awardXp, patchProfile, state.completedLessonSlugs, user]
+    [awardXp, supabase, user]
+  );
+
+  const logExerciseAttempt = useCallback<LevelUpContextValue['logExerciseAttempt']>(
+    async ({ lessonSlug, exerciseId, correct }) => {
+      if (!user) return;
+      const { data } = await supabase.rpc('log_exercise_attempt', {
+        p_lesson_slug: lessonSlug,
+        p_exercise_id: exerciseId,
+        p_correct: correct,
+      });
+      const result = data as { mistake_keys: string[] } | null;
+      if (!result) return;
+      setState((prev) => ({ ...prev, mistakeKeys: result.mistake_keys ?? prev.mistakeKeys }));
+    },
+    [supabase, user]
+  );
+
+  const activateXpBoost = useCallback<LevelUpContextValue['activateXpBoost']>(
+    async (minutes = 15) => {
+      if (!user) return false;
+      const { data, error } = await supabase.rpc('activate_xp_boost', { p_minutes: minutes });
+      if (error || !data) return false;
+      const result = data as { gems: number; xp_boost_until: string };
+      setState((prev) => ({ ...prev, gems: result.gems, xpBoostUntil: result.xp_boost_until }));
+      return true;
+    },
+    [supabase, user]
   );
 
   const completeActionMission = useCallback(
@@ -618,6 +708,8 @@ export function LevelUpProvider({ children }: { children: React.ReactNode }) {
       refreshProfile,
       awardXp,
       completeLesson,
+      logExerciseAttempt,
+      activateXpBoost,
       completeActionMission,
       claimDailyQuest,
       consumeHeart,

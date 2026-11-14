@@ -10,6 +10,7 @@ import {
   Gem,
   Heart,
   Home,
+  RotateCcw,
   ShieldCheck,
   Target,
   Trophy,
@@ -22,12 +23,13 @@ import { avatarStyle, cn, initialsOf } from '@/lib/utils';
 
 interface NavItem {
   href: string;
-  labelKey: 'learn' | 'quests' | 'leaderboard' | 'stack' | 'vault' | 'profile' | 'pro';
+  labelKey: 'learn' | 'practice' | 'quests' | 'leaderboard' | 'stack' | 'vault' | 'profile' | 'pro';
   icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
 }
 
 const NAV_ITEMS: NavItem[] = [
   { href: '/learn', labelKey: 'learn', icon: Home },
+  { href: '/practice', labelKey: 'practice', icon: RotateCcw },
   { href: '/quests', labelKey: 'quests', icon: Target },
   { href: '/leaderboard', labelKey: 'leaderboard', icon: Trophy },
   { href: '/vault', labelKey: 'vault', icon: Calculator },

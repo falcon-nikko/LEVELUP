@@ -80,6 +80,8 @@ interface Session {
   bonusGems: number;
   xpMultiplier: number;
   durationMin: number;
+  /** False for ad-hoc sessions (mistake ledger) that must not enter the lesson ledger. */
+  recordCompletion: boolean;
 }
 
 type Screen =
@@ -129,7 +131,11 @@ function selfCheckExercise(exampleId: string, lessonSlug: string, lesson: Lesson
   };
 }
 
-function buildSession(slug: string, reviewMode: boolean): Session | null {
+function buildSession(
+  slug: string,
+  reviewMode: boolean,
+  mistakeKeys: string[] = []
+): Session | null {
   const lesson = getLessonBySlug(slug);
 
   if (lesson) {
@@ -163,6 +169,51 @@ function buildSession(slug: string, reviewMode: boolean): Session | null {
       bonusGems: 0,
       xpMultiplier: reviewMode ? 0.4 : 1,
       durationMin: lesson.durationMin,
+      recordCompletion: true,
+    };
+  }
+
+  /* Spaced-repetition session built from the server-side mistake ledger. */
+  if (slug === 'mistakes') {
+    const pool: SessionExercise[] = [];
+    for (const key of mistakeKeys) {
+      const hash = key.indexOf('#');
+      if (hash < 0) continue;
+      const lessonSlug = key.slice(0, hash);
+      const exerciseId = key.slice(hash + 1);
+      const source = getLessonBySlug(lessonSlug);
+      const exercise = source?.exercises.find((ex) => ex.id === exerciseId);
+      if (source && exercise) pool.push(toSessionExercise(exercise, source.slug));
+    }
+    if (pool.length === 0) return null;
+
+    const firstLesson = getLessonBySlug(pool[0].sourceLessonSlug);
+    const track = getTrackBySlug(firstLesson?.trackSlug ?? 'ai-automation');
+    const unit = firstLesson ? getUnitBySlug(firstLesson.unitSlug) : undefined;
+    const picked = shuffle(pool).slice(0, 12);
+
+    return {
+      kind: 'practice',
+      id: 'mistakes',
+      unitSlug: unit?.slug ?? '',
+      trackSlug: track.slug,
+      title: bi('Repaso de fallos', 'Mistake review'),
+      accent: {
+        accent: track.accent,
+        accentLip: track.accentLip,
+        accentWash: track.accentWash,
+        accentInk: track.accentInk,
+        accentSoft: track.accentSoft,
+        badgeCode: track.badgeCode,
+        unitTitle: bi('Repaso espaciado', 'Spaced review'),
+        trackName: track.name,
+      },
+      exercises: picked,
+      bonusXp: 0,
+      bonusGems: 5,
+      xpMultiplier: 0.6,
+      durationMin: 6,
+      recordCompletion: false,
     };
   }
 
@@ -204,6 +255,7 @@ function buildSession(slug: string, reviewMode: boolean): Session | null {
       bonusGems: isBoss ? 15 : 10,
       xpMultiplier: 1,
       durationMin: isBoss ? 10 : 5,
+      recordCompletion: false,
     };
   }
 
@@ -269,15 +321,23 @@ function LessonPlayer() {
     soundEnabled,
     consumeHeart,
     refillHeartWithGems,
+    awardXp,
     completeLesson,
     completeActionMission,
+    logExerciseAttempt,
+    activateXpBoost,
     trackAffiliateClick,
   } = useLevelUp();
 
   /* The session is pure data, so it is built during the FIRST render: no
      spinner flash when a lesson opens. State is only needed because mistakes
      get re-queued into the screen list while playing. */
-  const boot = useMemo(() => buildSession(params.slug, reviewMode), [params.slug, reviewMode]);
+  const boot = useMemo(
+    () => buildSession(params.slug, reviewMode, state.mistakeKeys),
+    // The ledger is read once on boot; re-running would reshuffle mid-session.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [params.slug, reviewMode]
+  );
   const bootScreens = useMemo(() => (boot ? buildScreens(boot) : []), [boot]);
   const bootCursor = useMemo(() => {
     if (!boot || boot.kind !== 'practice') return 0;
@@ -334,7 +394,7 @@ function LessonPlayer() {
 
   /* ------------------------------- boot -------------------------------- */
   useEffect(() => {
-    const built = buildSession(params.slug, reviewMode);
+    const built = buildSession(params.slug, reviewMode, state.mistakeKeys);
     if (!built) return;
     const builtScreens = buildScreens(built);
     setSession(built);
@@ -419,6 +479,14 @@ function LessonPlayer() {
     setAttempts((a) => a + 1);
     playFeedbackSound(correct ? 'correct' : 'wrong', soundEnabled);
 
+    // Server-side spaced-repetition ledger: a wrong answer is stored, a later
+    // correct answer on the same exercise removes it.
+    void logExerciseAttempt({
+      lessonSlug: currentExercise.sourceLessonSlug,
+      exerciseId: currentExercise.id,
+      correct,
+    });
+
     if (correct) {
       setVerdict('correct');
       const alreadyMissed = mistakes.includes(currentExercise.id);
@@ -455,7 +523,16 @@ function LessonPlayer() {
       const remaining = await consumeHeart();
       if (remaining <= 0) setOutOfHearts(true);
     }
-  }, [answer, consumeHeart, currentExercise, mistakes, ready, soundEnabled, verdict]);
+  }, [
+    answer,
+    consumeHeart,
+    currentExercise,
+    logExerciseAttempt,
+    mistakes,
+    ready,
+    soundEnabled,
+    verdict,
+  ]);
 
   const confirmMission = useCallback(async () => {
     if (!session?.mission || missionDone) return;
@@ -482,14 +559,22 @@ function LessonPlayer() {
     const baseXp = Math.round((xpBank + session.bonusXp) * session.xpMultiplier);
 
     const run = async () => {
-      if (session.kind === 'lesson' || session.kind === 'practice') {
+      if (session.recordCompletion) {
         await completeLesson({
           lessonSlug: session.id,
           xpEarned: baseXp,
           durationMin: minutes,
+          perfect: mistakes.length === 0 && attempts > 0,
         });
-      } else {
+      } else if (session.kind === 'chest' || session.kind === 'boss') {
         await completeActionMission({ missionId: session.id, xpBonus: baseXp });
+      } else {
+        await awardXp({
+          source: 'practice',
+          sourceId: session.id,
+          amount: baseXp,
+          durationMin: minutes,
+        });
       }
       setSummary({ xp: baseXp, gems: session.bonusGems, accuracy, minutes });
     };
@@ -891,6 +976,10 @@ function LessonPlayer() {
   }
 
   /* -------------------------------- HUD -------------------------------- */
+  const boostActive = Boolean(
+    state.xpBoostUntil && new Date(state.xpBoostUntil).getTime() > Date.now()
+  );
+
   const hud = (
     <div className="sticky top-0 z-20 border-b-2 border-swan bg-paper/95 backdrop-blur">
       <div className="mx-auto flex w-full max-w-xl items-center gap-3 px-5 py-3">
@@ -922,6 +1011,14 @@ function LessonPlayer() {
             {xpBank}
           </span>
         </div>
+        {boostActive && (
+          <div className="flex shrink-0 items-center gap-1 rounded-xl bg-ecto-wash px-2.5 py-1">
+            <Zap className="h-4 w-4 text-ecto-dark" strokeWidth={3} />
+            <span className="font-mono text-[12px] font-extrabold tabular-nums text-ecto-dark">
+              ×2
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -985,6 +1082,20 @@ function LessonPlayer() {
         accent={session.accent}
         labels={stageLabels}
         locale={locale}
+        boost={
+          session.kind === 'lesson'
+            ? {
+                active: Boolean(
+                  state.xpBoostUntil && new Date(state.xpBoostUntil).getTime() > Date.now()
+                ),
+                affordable: state.gems >= 30,
+                gems: state.gems,
+                onActivate: () => {
+                  void activateXpBoost(15);
+                },
+              }
+            : undefined
+        }
         onStart={advance}
         onSkipToPractice={() => {
           const first = screens.findIndex((s) => s.kind === 'exercise');

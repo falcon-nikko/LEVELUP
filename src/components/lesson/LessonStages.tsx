@@ -6,6 +6,7 @@ import {
   BookOpen,
   Check,
   ExternalLink,
+  Gem,
   GraduationCap,
   Lightbulb,
   Swords,
@@ -60,6 +61,7 @@ export function LessonIntro({
   locale,
   onStart,
   onSkipToPractice,
+  boost,
 }: {
   lesson: Lesson;
   accent: Accent;
@@ -67,6 +69,8 @@ export function LessonIntro({
   locale: 'es' | 'en';
   onStart: () => void;
   onSkipToPractice: () => void;
+  /** Optional double-XP boost control, hidden when unavailable. */
+  boost?: { active: boolean; affordable: boolean; gems: number; onActivate: () => void };
 }) {
   const chips = [
     { Icon: Timer, value: `${lesson.durationMin} min` },
@@ -107,6 +111,47 @@ export function LessonIntro({
           {l(lesson.outcome, locale)}
         </p>
       </div>
+
+      {boost && (
+        <div
+          className="mt-4 flex items-center gap-3 rounded-2xl border-2 px-3.5 py-2.5"
+          style={{
+            borderColor: boost.active ? '#58CC02' : '#FFC800',
+            backgroundColor: boost.active ? '#D7FFB8' : '#FFF4CC',
+          }}
+        >
+          <Zap
+            className="h-4 w-4 shrink-0"
+            strokeWidth={3}
+            style={{ color: boost.active ? '#58A700' : '#E5A800' }}
+          />
+          <p className="min-w-0 flex-1 text-[12px] font-bold leading-snug text-navy">
+            {boost.active
+              ? locale === 'es'
+                ? 'Doble XP activo durante esta sesión.'
+                : 'Double XP is active for this session.'
+              : locale === 'es'
+                ? `Duplica el XP de esta lección por 30 gemas (tienes ${boost.gems}).`
+                : `Double the XP of this lesson for 30 gems (you have ${boost.gems}).`}
+          </p>
+          {!boost.active && (
+            <button
+              type="button"
+              disabled={!boost.affordable}
+              onClick={boost.onActivate}
+              className={cnChip(boost.affordable)}
+              style={
+                boost.affordable
+                  ? ({ backgroundColor: '#FFC800', color: '#042C60', '--lip': '#E5A800' } as React.CSSProperties)
+                  : undefined
+              }
+            >
+              <Gem className="h-3.5 w-3.5" strokeWidth={3} />
+              30
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="mt-5 flex flex-wrap gap-2">
         {chips.map(({ Icon, value }) => (
@@ -557,4 +602,10 @@ function cnBtn(enabled: boolean): string {
   return enabled
     ? 'btn-arcade flex-1'
     : 'btn-arcade flex-1 opacity-45 pointer-events-none';
+}
+
+function cnChip(enabled: boolean): string {
+  return enabled
+    ? 'btn-arcade shrink-0 !px-3 !py-2 !text-[11px]'
+    : 'btn-arcade shrink-0 !px-3 !py-2 !text-[11px] pointer-events-none opacity-45';
 }

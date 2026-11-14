@@ -4,13 +4,19 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
+  ArrowRight,
   BookOpen,
   Check,
+  Clock,
+  Crown,
   Gift,
   Lock,
   MoveDown,
+  RotateCcw,
   Swords,
   Trophy,
+  X,
+  Zap,
 } from 'lucide-react';
 import { AppShell } from '@/components/AppShell';
 import { DailyGoalCard } from '@/components/DailyGoalCard';
@@ -56,12 +62,194 @@ function NodeIcon({ node }: { node: PathNode }) {
   return <BookOpen className="h-6 w-6" strokeWidth={2.8} />;
 }
 
+/* ==========================================================================
+   Node popup — the Duolingo-style card anchored above the selected node.
+   One card, one decision: play it, review it, or chase the legendary run.
+   ========================================================================== */
+function NodePopup({
+  node,
+  locale,
+  accent,
+  accentLip,
+  accentInk,
+  legendary,
+  labels,
+  onPlay,
+  onClose,
+}: {
+  node: PathNode;
+  locale: 'es' | 'en';
+  accent: string;
+  accentLip: string;
+  accentInk: string;
+  legendary: boolean;
+  labels: {
+    start: string;
+    review: string;
+    legendary: string;
+    legendaryDone: string;
+    chest: string;
+    chestDesc: string;
+    boss: string;
+    bossDesc: string;
+    locked: string;
+    chestLocked: string;
+    play: string;
+  };
+  onPlay: (mode?: 'review') => void;
+  onClose: () => void;
+}) {
+  const isBoss = node.type === 'boss';
+  const isChest = node.type === 'chest';
+  const lesson = node.lesson;
+  const done = node.status === 'complete';
+
+  const title = isChest
+    ? labels.chest
+    : isBoss
+      ? labels.boss
+      : lesson
+        ? l(lesson.title, locale)
+        : '';
+  const subtitle = isChest
+    ? labels.chestDesc
+    : isBoss
+      ? labels.bossDesc
+      : lesson
+        ? l(lesson.outcome, locale)
+        : '';
+
+  const reward = isChest
+    ? '+10 💎'
+    : isBoss
+      ? '+25 XP · +15 💎'
+      : lesson
+        ? `+${lesson.xpReward + lesson.actionMission.xpBonus} XP`
+        : '';
+
+  const headColor = done ? '#58CC02' : isBoss ? '#FF4B4B' : isChest ? '#FFC800' : accent;
+  const headLip = done ? '#58A700' : isBoss ? '#EA2B2B' : isChest ? '#E5A800' : accentLip;
+  const headInk = isChest ? '#042C60' : accentInk;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8, scale: 0.94 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ type: 'spring', stiffness: 380, damping: 26 }}
+      className="absolute bottom-[calc(100%+18px)] left-1/2 z-30 w-[252px] -translate-x-1/2"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div
+        className="overflow-hidden rounded-2xl border-2 border-swan bg-paper"
+        style={{ boxShadow: `0 6px 0 0 #E5E5E5` }}
+      >
+        <div className="px-3.5 py-2.5" style={{ backgroundColor: headColor, color: headInk }}>
+          <div className="flex items-start gap-2">
+            <div className="min-w-0 flex-1">
+              <div className="text-[13px] font-extrabold leading-tight">{title}</div>
+              {reward && (
+                <div className="mt-0.5 font-mono text-[10.5px] font-extrabold opacity-90">
+                  {reward}
+                </div>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label={labels.play}
+              className="shrink-0 rounded-lg p-0.5 opacity-70 transition-opacity hover:opacity-100"
+            >
+              <X className="h-4 w-4" strokeWidth={3} />
+            </button>
+          </div>
+        </div>
+
+        {subtitle && (
+          <p className="px-3.5 pt-2.5 text-[11.5px] font-semibold leading-snug text-wolf">
+            {subtitle}
+          </p>
+        )}
+
+        {lesson && (
+          <div className="mt-2.5 flex items-center gap-3 px-3.5 text-[10.5px] font-extrabold text-wolf">
+            <span className="flex items-center gap-1">
+              <Clock className="h-3 w-3" strokeWidth={3} />
+              {lesson.durationMin} min
+            </span>
+            <span className="flex items-center gap-1">
+              <Zap className="h-3 w-3" strokeWidth={3} />
+              {lesson.exercises.length}
+            </span>
+            {legendary && (
+              <span className="ml-auto flex items-center gap-1 text-fox-dark">
+                <Crown className="h-3 w-3" strokeWidth={3} />
+                ★
+              </span>
+            )}
+          </div>
+        )}
+
+        <div className="flex flex-col gap-2 p-3.5">
+          <button
+            type="button"
+            onClick={() => onPlay()}
+            className="btn-arcade w-full !py-2.5 !text-[12px]"
+            style={
+              {
+                backgroundColor: done ? '#58CC02' : headColor,
+                color: isChest && !done ? '#042C60' : '#FFFFFF',
+                '--lip': done ? '#58A700' : headLip,
+              } as React.CSSProperties
+            }
+          >
+            {done && !isChest && !isBoss ? labels.review : labels.play}
+            <ArrowRight className="h-3.5 w-3.5" strokeWidth={3} />
+          </button>
+
+          {done && lesson && (
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => onPlay('review')}
+                className="btn-ghost flex-1 !py-2 !text-[11px]"
+              >
+                <RotateCcw className="h-3.5 w-3.5" strokeWidth={3} />
+                ×0,4
+              </button>
+              <button
+                type="button"
+                disabled={legendary}
+                onClick={() => onPlay()}
+                className={
+                  legendary
+                    ? 'btn-ghost pointer-events-none flex-1 !py-2 !text-[11px] opacity-50'
+                    : 'btn-ghost flex-1 !py-2 !text-[11px]'
+                }
+                style={legendary ? undefined : { borderColor: '#FFC800', color: '#E5A800' }}
+              >
+                <Crown className="h-3.5 w-3.5" strokeWidth={3} />
+                {legendary ? labels.legendaryDone : labels.legendary}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div
+        className="mx-auto h-3 w-3 -translate-y-[7px] rotate-45 border-b-2 border-r-2 border-swan bg-paper"
+        aria-hidden="true"
+      />
+    </motion.div>
+  );
+}
+
 export default function LearnPage() {
   const router = useRouter();
   const { t, locale, state, setActiveTrack, soundEnabled, status, profileLoaded } = useLevelUp();
   const track = getTrackBySlug(state.activeTrackSlug);
 
   const [lockedHint, setLockedHint] = useState<string | null>(null);
+  const [popupNode, setPopupNode] = useState<PathNode | null>(null);
   const currentNodeRef = useRef<HTMLDivElement | null>(null);
 
   const { groups, nodes, currentIndex } = useMemo(
@@ -104,13 +292,19 @@ export default function LearnPage() {
       return;
     }
     playFeedbackSound('click', soundEnabled);
-    if (node.type === 'lesson' && node.lesson) {
-      const suffix = node.status === 'complete' ? '?mode=review' : '';
-      router.push(`/lesson/${node.lesson.slug}${suffix}`);
-      return;
-    }
-    router.push(`/lesson/${node.id}`);
+    setPopupNode((prev) => (prev?.id === node.id ? null : node));
   };
+
+  const playNode = (node: PathNode, mode?: 'review') => {
+    playFeedbackSound('click', soundEnabled);
+    const href =
+      node.type === 'lesson' && node.lesson
+        ? `/lesson/${node.lesson.slug}${mode === 'review' ? '?mode=review' : ''}`
+        : `/lesson/${node.id}`;
+    router.push(href);
+  };
+
+  const isLegendary = (slug?: string) => Boolean(slug && state.legendarySlugs.includes(slug));
 
   return (
     <AppShell
@@ -222,7 +416,11 @@ export default function LearnPage() {
               </motion.div>
 
               {/* Winding node column */}
-              <div className="relative mt-6" style={{ height }}>
+              <div
+                className="relative mt-6"
+                style={{ height }}
+                onClick={() => setPopupNode(null)}
+              >
                 <svg
                   width={PATH_W}
                   height={height}
@@ -288,8 +486,35 @@ export default function LearnPage() {
                         width: NODE_SIZE,
                       }}
                     >
+                      {/* ---------------- node popup ---------------- */}
+                      {popupNode?.id === node.id && (
+                        <NodePopup
+                          node={node}
+                          locale={locale}
+                          accent={track.accent}
+                          accentLip={track.accentLip}
+                          accentInk={track.accentInk}
+                          legendary={isLegendary(node.lesson?.slug)}
+                          labels={{
+                            start: t.path.startLesson,
+                            review: t.path.reviewLesson,
+                            legendary: t.path.legendaryLabel,
+                            legendaryDone: t.path.legendaryDone,
+                            chest: t.path.chestTitle,
+                            chestDesc: t.path.chestDesc,
+                            boss: t.path.bossTitle,
+                            bossDesc: t.path.bossDesc,
+                            locked: t.path.lockedLesson,
+                            chestLocked: t.path.chestNeedsLessons,
+                            play: t.path.playNode,
+                          }}
+                          onPlay={(mode) => playNode(node, mode)}
+                          onClose={() => setPopupNode(null)}
+                        />
+                      )}
+
                       {/* Callout on the node you should play next */}
-                      {isCurrent && (
+                      {isCurrent && popupNode?.id !== node.id && (
                         <motion.div
                           initial={{ opacity: 0, y: 6, scale: 0.9 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -313,14 +538,6 @@ export default function LearnPage() {
                             aria-hidden="true"
                           />
                         </motion.div>
-                      )}
-
-                      {isCurrent && (
-                        <span
-                          className="absolute inset-0 animate-ring-pulse rounded-full"
-                          style={{ border: `4px solid ${fill}` }}
-                          aria-hidden="true"
-                        />
                       )}
 
                       <motion.div animate={isCurrent ? { y: [0, -7, 0] } : { y: 0 }}
