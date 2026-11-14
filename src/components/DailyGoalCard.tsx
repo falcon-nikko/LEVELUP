@@ -55,7 +55,7 @@ export function DailyGoalCard() {
           {complete ? (
             <>
               <div className="flex items-center gap-1.5 text-[15px] font-extrabold text-fox-dark">
-                <Flame className="h-[18px] w-[18px] animate-flicker" strokeWidth={2.8} />
+                <Flame className="h-[18px] w-[18px]" strokeWidth={2.8} />
                 {t.path.goalDone}
               </div>
               <p className="mt-1 text-[12px] font-semibold leading-snug text-wolf">

@@ -44,7 +44,7 @@ export const UI_DICT = {
     },
     auth: {
       brandLine: 'Entrenamiento diario de habilidades digitales',
-      titleIn: 'Bienvenido de vuelta',
+      titleIn: 'Continúa el entrenamiento',
       titleUp: 'Crea tu cuenta',
       subtitle:
         'Necesitas una cuenta para empezar: tu racha, tus vidas y tu XP se guardan en la nube y compiten en la liga real.',
@@ -394,7 +394,7 @@ export const UI_DICT = {
     },
     auth: {
       brandLine: 'Daily digital-skills training',
-      titleIn: 'Welcome back',
+      titleIn: 'Pick up your training',
       titleUp: 'Create your account',
       subtitle:
         'You need an account to start: your streak, hearts and XP are stored in the cloud and compete in the real league.',

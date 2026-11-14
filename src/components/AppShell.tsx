@@ -64,7 +64,7 @@ function StatChip({
   return (
     <div className="flex items-center gap-1.5" title={label}>
       <Icon
-        className={cn('h-[22px] w-[22px]', tone, color === 'fox' && 'animate-flicker')}
+        className={cn('h-[22px] w-[22px]', tone)}
         strokeWidth={2.6}
       />
       <span className={cn('text-[15px] font-extrabold tabular-nums', tone)}>{value}</span>

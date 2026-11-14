@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { ArrowRight, Flame, Trophy, Users } from 'lucide-react';
 import { useLevelUp } from '@/context/LevelUpContext';
 import { useLeague } from '@/lib/supabase/league';
@@ -40,8 +39,8 @@ export function LeagueWidget({
         <div className="space-y-2 p-4">
           {[0, 1, 2].map((i) => (
             <div key={i} className="flex items-center gap-3">
-              <div className="h-9 w-9 animate-pulse rounded-full bg-polar" />
-              <div className="h-3 flex-1 animate-pulse rounded-full bg-polar" />
+              <div className="h-9 w-9 rounded-full bg-swan" />
+              <div className="h-3 flex-1 rounded-full bg-swan" />
             </div>
           ))}
         </div>
@@ -112,18 +111,15 @@ export function LeagueWidget({
 
           <Link
             href="/leaderboard"
-            className="flex items-center justify-between gap-2 border-t-2 border-swan bg-polar px-4 py-3 text-[12px] font-extrabold uppercase tracking-[0.06em] text-macaw transition-colors hover:text-macaw-dark"
+            className="group flex items-center justify-between gap-2 border-t-2 border-swan bg-polar px-4 py-3 text-[12px] font-extrabold uppercase tracking-[0.06em] text-macaw transition-colors hover:text-macaw-dark"
           >
             {me
               ? `${t.league.yourRank}: #${me.rank}`
               : `${week?.memberCount ?? rows.length} ${t.league.memberCount}`}
-            <motion.span
-              animate={{ x: [0, 3, 0] }}
-              transition={{ repeat: Infinity, duration: 1.8 }}
-              className="inline-flex"
-            >
-              <ArrowRight className="h-4 w-4" strokeWidth={3} />
-            </motion.span>
+            <ArrowRight
+              className="h-4 w-4 transition-transform duration-150 group-hover:translate-x-1"
+              strokeWidth={3}
+            />
           </Link>
         </>
       )}

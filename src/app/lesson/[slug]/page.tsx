@@ -41,6 +41,7 @@ import {
   unplacePiece,
 } from '@/lib/curriculum/grading';
 import { ExerciseBody, Verdict } from '@/components/lesson/ExerciseBody';
+import { Mascot } from '@/components/Mascot';
 import {
   Accent,
   ExamplePhase,
@@ -361,6 +362,9 @@ function LessonPlayer() {
   const [firstTryHits, setFirstTryHits] = useState(0);
   const [attempts, setAttempts] = useState(0);
   const [xpBank, setXpBank] = useState(0);
+  const [xpFloat, setXpFloat] = useState<{ amount: number; token: number } | null>(null);
+  const [heartToken, setHeartToken] = useState(0);
+  const prevHearts = useRef(state.hearts);
   const [outOfHearts, setOutOfHearts] = useState(false);
   const [refilling, setRefilling] = useState(false);
   const [quitOpen, setQuitOpen] = useState(false);
@@ -373,6 +377,13 @@ function LessonPlayer() {
     minutes: number;
   } | null>(null);
   const startedAt = useRef<number>(Date.now());
+
+  // Losing a heart is the only negative event in the HUD, so it gets the only
+  // shake: bounded, one pass, keyed so the next loss can replay it.
+  useEffect(() => {
+    if (state.hearts < prevHearts.current) setHeartToken((n) => n + 1);
+    prevHearts.current = state.hearts;
+  }, [state.hearts]);
 
   /* ----------------------------- navigation ---------------------------- */
   /** Moving to a screen also resets the answer to the shape that screen needs. */
@@ -491,7 +502,9 @@ function LessonPlayer() {
       setVerdict('correct');
       const alreadyMissed = mistakes.includes(currentExercise.id);
       if (!alreadyMissed) setFirstTryHits((n) => n + 1);
-      setXpBank((xp) => xp + Math.round(currentExercise.xp * (alreadyMissed ? 0.5 : 1)));
+      const gained = Math.round(currentExercise.xp * (alreadyMissed ? 0.5 : 1));
+      setXpBank((xp) => xp + gained);
+      setXpFloat({ amount: gained, token: Date.now() });
       return;
     }
 
@@ -800,7 +813,7 @@ function LessonPlayer() {
             ) : session.kind === 'chest' ? (
               <Gem className="h-12 w-12" strokeWidth={2.6} />
             ) : (
-              <Check className="h-14 w-14" strokeWidth={3.2} />
+              <Mascot mood="cheer" size={62} animateKey={session.id} className="translate-y-1" />
             )}
           </motion.span>
 
@@ -999,17 +1012,31 @@ function LessonPlayer() {
             transition={{ type: 'spring', stiffness: 220, damping: 28 }}
           />
         </div>
-        <div className="flex shrink-0 items-center gap-1.5 rounded-xl bg-cardinal-wash px-2.5 py-1">
+        <div
+          key={`hearts-${heartToken}`}
+          className={cn(
+            'flex shrink-0 items-center gap-1.5 rounded-xl bg-cardinal-wash px-2.5 py-1',
+            heartToken > 0 && 'animate-shake'
+          )}
+        >
           <Heart className="h-4 w-4 text-cardinal" strokeWidth={3} fill="currentColor" />
           <span className="font-mono text-[12px] font-extrabold tabular-nums text-cardinal-dark">
             {state.hearts}
           </span>
         </div>
-        <div className="flex shrink-0 items-center gap-1.5 rounded-xl bg-bee-wash px-2.5 py-1">
+        <div className="relative flex shrink-0 items-center gap-1.5 rounded-xl bg-bee-wash px-2.5 py-1">
           <Zap className="h-4 w-4 text-bee-dark" strokeWidth={3} />
           <span className="font-mono text-[12px] font-extrabold tabular-nums text-fox-dark">
             {xpBank}
           </span>
+          {xpFloat && (
+            <span
+              key={xpFloat.token}
+              className="animate-xp-rise pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 font-mono text-[12px] font-extrabold text-ecto-dark"
+            >
+              +{xpFloat.amount}
+            </span>
+          )}
         </div>
         {boostActive && (
           <div className="flex shrink-0 items-center gap-1 rounded-xl bg-ecto-wash px-2.5 py-1">
@@ -1195,7 +1222,14 @@ function LessonPlayer() {
               verdict === 'correct' ? 'border-ecto bg-ecto-wash' : 'border-cardinal bg-cardinal-wash'
             )}
           >
-            <div className="mx-auto w-full max-w-xl">
+            <div className="mx-auto flex w-full max-w-xl items-start gap-3">
+              <Mascot
+                mood={verdict === 'correct' ? 'cheer' : 'wrong'}
+                size={46}
+                animateKey={`${currentExercise.id}-${verdict}`}
+                className="mt-0.5"
+              />
+              <div className="min-w-0 flex-1">
               <div
                 className={cn(
                   'flex items-center gap-2 text-[13px] font-extrabold uppercase tracking-wide',
@@ -1227,6 +1261,7 @@ function LessonPlayer() {
               <p className="mt-1.5 text-[12.5px] font-semibold leading-relaxed text-graphite">
                 {l(currentExercise.explanation, locale)}
               </p>
+              </div>
             </div>
           </div>
         )}

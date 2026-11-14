@@ -167,9 +167,9 @@ export default function LeaderboardPage() {
         <div className="panel mt-6 space-y-3 p-5">
           {[0, 1, 2, 3, 4].map((i) => (
             <div key={i} className="flex items-center gap-3">
-              <div className="h-10 w-10 animate-pulse rounded-full bg-polar" />
-              <div className="h-3.5 flex-1 animate-pulse rounded-full bg-polar" />
-              <div className="h-3.5 w-14 animate-pulse rounded-full bg-polar" />
+              <div className="h-10 w-10 rounded-full bg-swan" />
+              <div className="h-3.5 flex-1 rounded-full bg-swan" />
+              <div className="h-3.5 w-14 rounded-full bg-swan" />
             </div>
           ))}
         </div>

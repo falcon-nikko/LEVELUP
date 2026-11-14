@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { AppShell } from '@/components/AppShell';
 import { StreakCalendar } from '@/components/StreakCalendar';
+import { Mascot } from '@/components/Mascot';
 import { useLevelUp } from '@/context/LevelUpContext';
 import { getLessonBySlug, getTrackBySlug } from '@/lib/curriculum/tracks';
 import { buildTrackPath } from '@/lib/curriculum/path';
@@ -183,13 +184,16 @@ export default function PracticePage() {
             </Link>
           </>
         ) : (
-          <div className="mt-3 rounded-xl border-2 border-ecto bg-ecto-wash px-3.5 py-3">
-            <div className="text-[12.5px] font-extrabold text-ecto-dark">
-              {t.practice.mistakesEmpty}
+          <div className="mt-3 flex items-center gap-3 rounded-xl border-2 border-ecto bg-ecto-wash px-3.5 py-3">
+            <Mascot mood="cheer" size={48} animateKey="mistakes-clear" />
+            <div className="min-w-0">
+              <div className="text-[12.5px] font-extrabold text-ecto-dark">
+                {t.practice.mistakesEmpty}
+              </div>
+              <p className="mt-0.5 text-[12px] font-semibold leading-snug text-navy">
+                {t.practice.mistakesEmptyDesc}
+              </p>
             </div>
-            <p className="mt-0.5 text-[12px] font-semibold leading-snug text-navy">
-              {t.practice.mistakesEmptyDesc}
-            </p>
           </div>
         )}
       </section>
@@ -211,8 +215,8 @@ export default function PracticePage() {
         </p>
 
         {boostActive ? (
-          <div className="mt-3 flex items-center gap-2 rounded-xl border-2 border-ecto bg-ecto-wash px-3.5 py-2.5">
-            <Zap className="h-4 w-4 text-ecto-dark" strokeWidth={3} />
+          <div className="mt-3 flex items-center gap-3 rounded-xl border-2 border-ecto bg-ecto-wash px-3.5 py-2.5">
+            <Mascot mood="boost" size={44} animateKey={state.xpBoostUntil ?? 'off'} />
             <span className="text-[12.5px] font-extrabold text-ecto-dark">
               {t.practice.boostActive}{' '}
               {new Date(state.xpBoostUntil!).toLocaleTimeString(locale === 'es' ? 'es-ES' : 'en-GB', {

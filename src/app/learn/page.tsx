@@ -19,6 +19,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { AppShell } from '@/components/AppShell';
+import { Mascot } from '@/components/Mascot';
 import { DailyGoalCard } from '@/components/DailyGoalCard';
 import { HeartsCard } from '@/components/HeartsCard';
 import { LeagueWidget } from '@/components/LeagueWidget';
@@ -540,10 +541,11 @@ export default function LearnPage() {
                         </motion.div>
                       )}
 
-                      <motion.div animate={isCurrent ? { y: [0, -7, 0] } : { y: 0 }}
+                      <motion.div
+                        animate={isCurrent ? { y: [0, -8, 0] } : { y: 0 }}
                         transition={
                           isCurrent
-                            ? { repeat: Infinity, duration: 1.5, ease: 'easeInOut' }
+                            ? { duration: 0.62, repeat: 2, repeatDelay: 0.22, ease: 'easeOut' }
                             : { type: 'spring', stiffness: 400, damping: 28 }
                         }
                       >
@@ -602,9 +604,7 @@ export default function LearnPage() {
 
         {currentIndex >= nodes.length && nodes.length > 0 && (
           <div className="panel mb-10 flex flex-col items-center gap-2 px-5 py-7 text-center">
-            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-bee text-navy" style={{ boxShadow: '0 4px 0 0 #E5A800' }}>
-              <Trophy className="h-7 w-7" strokeWidth={2.8} />
-            </span>
+            <Mascot mood="cheer" size={84} withStep animateKey="path-complete" />
             <h3 className="text-[17px] font-extrabold text-navy">{t.path.allUnitsDone}</h3>
             <p className="max-w-xs text-[12.5px] font-semibold leading-snug text-wolf">
               {t.path.allUnitsDoneDesc}

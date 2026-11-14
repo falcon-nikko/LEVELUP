@@ -17,6 +17,7 @@ import { Diagram } from '@/components/diagrams/Diagram';
 import { Lesson, TheoryBlock, WorkedExample } from '@/lib/curriculum/types';
 import { AffiliateTool } from '@/lib/curriculum/affiliates';
 import { LocalizedText, l } from '@/lib/i18n/dictionaries';
+import { Mascot } from '@/components/Mascot';
 
 export interface Accent {
   accent: string;
@@ -97,19 +98,22 @@ export function LessonIntro({
         {l(lesson.title, locale)}
       </h1>
 
-      <div
-        className="mt-4 rounded-2xl border-2 px-4 py-3.5"
-        style={{ borderColor: accent.accent, backgroundColor: accent.accentWash }}
-      >
+      <div className="mt-4 flex items-end gap-3">
+        <Mascot mood="idle" size={58} withStep animateKey={lesson.slug} className="mb-1" />
         <div
-          className="text-[10px] font-extrabold uppercase tracking-[0.12em]"
-          style={{ color: accent.accentLip }}
+          className="min-w-0 flex-1 rounded-2xl border-2 px-4 py-3.5"
+          style={{ borderColor: accent.accent, backgroundColor: accent.accentWash }}
         >
-          {labels.outcomeLabel}
+          <div
+            className="text-[10px] font-extrabold uppercase tracking-[0.12em]"
+            style={{ color: accent.accentLip }}
+          >
+            {labels.outcomeLabel}
+          </div>
+          <p className="mt-1 text-[14px] font-bold leading-snug text-navy">
+            {l(lesson.outcome, locale)}
+          </p>
         </div>
-        <p className="mt-1 text-[14px] font-bold leading-snug text-navy">
-          {l(lesson.outcome, locale)}
-        </p>
       </div>
 
       {boost && (

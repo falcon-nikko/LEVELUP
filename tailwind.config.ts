@@ -61,37 +61,12 @@ const config: Config = {
         duolingo: '16px',
       },
       keyframes: {
-        'node-bounce': {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-7px)' },
-        },
-        'pop-in': {
-          '0%': { opacity: '0', transform: 'scale(0.82)' },
-          '70%': { transform: 'scale(1.04)' },
-          '100%': { opacity: '1', transform: 'scale(1)' },
-        },
-        'slide-up': {
-          '0%': { transform: 'translateY(100%)' },
-          '100%': { transform: 'translateY(0)' },
-        },
         shake: {
           '0%, 100%': { transform: 'translateX(0)' },
           '20%': { transform: 'translateX(-7px)' },
           '40%': { transform: 'translateX(6px)' },
           '60%': { transform: 'translateX(-4px)' },
           '80%': { transform: 'translateX(3px)' },
-        },
-        flicker: {
-          '0%, 100%': { transform: 'scale(1) rotate(-2deg)' },
-          '50%': { transform: 'scale(1.12) rotate(3deg)' },
-        },
-        'ring-pulse': {
-          '0%': { transform: 'scale(0.9)', opacity: '0.85' },
-          '100%': { transform: 'scale(1.5)', opacity: '0' },
-        },
-        float: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-10px)' },
         },
         'xp-rise': {
           '0%': { opacity: '0', transform: 'translateY(8px) scale(0.9)' },
@@ -100,13 +75,7 @@ const config: Config = {
         },
       },
       animation: {
-        'node-bounce': 'node-bounce 1.4s cubic-bezier(0.34, 1.56, 0.64, 1) infinite',
-        'pop-in': 'pop-in 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both',
-        'slide-up': 'slide-up 0.22s cubic-bezier(0.16, 1, 0.3, 1) both',
         shake: 'shake 0.36s ease-in-out both',
-        flicker: 'flicker 1.1s ease-in-out infinite',
-        'ring-pulse': 'ring-pulse 1.8s ease-out infinite',
-        float: 'float 3.4s ease-in-out infinite',
         'xp-rise': 'xp-rise 1.1s ease-out both',
       },
     },
