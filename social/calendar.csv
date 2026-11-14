@@ -1,0 +1,31 @@
+day,offset,weekday,channel,pillar,topic,cta,asset,publish_cet
+1,0,lunes,linkedin+x,cifra,BE ROAS = 1/margen y por qué las plataformas sobreestiman,no,tarjeta de cifra,08:20
+2,1,martes,linkedin+x,error,Dinero en float: 19.99*3 + 5.5*2 no da 70.97,no,captura de código,08:20
+3,2,miercoles,linkedin+x,cifra,Lista fría 1-2% vs señal de cambio de trabajo 6-10%,no,tarjeta de cifra,08:20
+4,3,jueves,linkedin+x,cuenta,Funnel de agencia completo: 100000 -> 3 clientes y CAC 317 EUR,no,diagrama funnel,08:20
+5,4,viernes,linkedin+x,metodo,Ejemplo resuelto antes de pedir nada (y cuándo al revés),soft,captura de lección,08:20
+6,5,sabado,linkedin+x,error,Entregabilidad: warmup 21 días + rampa = D+43,no,tarjeta de cifra,10:00
+7,6,domingo,linkedin+x+vertical,cifra,Recap en vertical: 3 números de la semana,soft,guion vertical,19:30
+8,7,lunes,newsletter+linkedin,metodo,Interleaving: 63% vs 54% al discriminar casos parecidos,soft,captura de cofre,08:20
+9,8,martes,linkedin+x,cifra,Bajar de 1900 a 1400 EUR pierde 563 EUR/mes,no,tarjeta de cifra,08:20
+10,9,miercoles,linkedin+x,metodo,El fallo vuelve: ledger de errores y sesión de repaso,si,captura de /practice,08:20
+11,10,jueves,linkedin+x,error,Salida JSON de un LLM: modo estructurado vs pedirlo por favor,no,captura de código,08:20
+12,11,viernes,linkedin+x,cuenta,Capacidad real de outreach: 4 x 25 x 21 / 5 = 420 contactos/mes,no,diagrama ecuación,08:20
+13,12,sabado,linkedin+x,cifra,Fatiga creativa: frecuencia > 3 con CTR cayendo,no,tarjeta de cifra,10:00
+14,13,domingo,linkedin+x+vertical,metodo,Anatomía de una lección de 12-15 preguntas,si,guion vertical,19:30
+15,14,lunes,newsletter+linkedin,cuenta,Churn 45% -> 11%: qué cambió de verdad,soft,diagrama barras,08:20
+16,15,martes,linkedin+x,error,Primer toque: menos de 80 palabras y texto plano,no,captura de email,08:20
+17,16,miercoles,linkedin+x,cifra,Coste por reunión: 80 EUR en frío / 117 EUR visita de pricing / 60 EUR cambio de trabajo,si,tarjeta de cifra,08:20
+18,17,jueves,linkedin+x,error,SPF < 10 lookups + DKIM 2048 + DMARC p=quarantine,no,captura de config,08:20
+19,18,viernes,linkedin+x,cuenta,Subir precio: umbral de aceptación del 60%,no,diagrama tabla,08:20
+20,19,sabado,linkedin+x,herramienta,Stack de outreach honesto: qué sustituye y cuándo no usarlo,no,captura de /stack,10:00
+21,20,domingo,linkedin+x+vertical,cuenta,Cerrar 11% -> 34% y la llamada 2/15/5/5/3,si,guion vertical,19:30
+22,21,lunes,newsletter+linkedin,cifra,Umbral de corte: 150 clics y presupuesto = 3 x CPA x creativos,no,tarjeta de cifra,08:20
+23,22,martes,linkedin+x,cuenta,Caja: gasto diario x días de ciclo y escalados del 20%,no,diagrama timeline,08:20
+24,23,miercoles,linkedin+x,metodo,La barra nunca retrocede: vidas y congeladores de racha,si,captura de calendario,08:20
+25,24,jueves,linkedin+x,error,RAG: por qué la respuesta cita el chunk equivocado,no,captura de lección,08:20
+26,25,viernes,linkedin+x,herramienta,Make vs n8n autoalojado: coste real y cuándo cambia la respuesta,no,captura de /vault,08:20
+27,26,sabado,linkedin+x,cifra,Reply rate por sector: media 3.43% / P75 5.5% / P90 10.7%,no,diagrama barras,10:00
+28,27,domingo,linkedin+x+vertical,cuenta,Un mes de agencia en una fila: 8.4 llamadas x 33% = 5267 EUR de MRR nuevo,si,guion vertical,19:30
+29,28,lunes,newsletter+linkedin,metodo,Qué aprendimos publicando 30 días con cifras propias,soft,tarjeta de cifra,08:20
+30,29,martes,linkedin+x+vertical,cifra,Cierre: los 5 números que un operador debería saber de memoria,si,guion vertical,19:30
