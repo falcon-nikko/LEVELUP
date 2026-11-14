@@ -1,16 +1,19 @@
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { hasUsableSession, readCookieSession } from '@/lib/supabase/session';
 
 /**
  * Root route is a gate, not a brochure.
  * Signed in → the path. Signed out → the account screen.
- * No demo content, no guest preview, no seeded numbers.
+ *
+ * The session is decoded from the request cookies instead of calling
+ * `supabase.auth.getUser()`: that verification request needs outbound HTTPS to
+ * the Supabase host, which is unavailable in sandboxed preview environments.
+ * Real authorization still happens in Postgres RLS on every client call.
  */
 export default async function RootPage() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const cookieStore = await cookies();
+  const session = readCookieSession(cookieStore.getAll());
 
-  redirect(user ? '/learn' : '/auth');
+  redirect(hasUsableSession(session) ? '/learn' : '/auth');
 }
