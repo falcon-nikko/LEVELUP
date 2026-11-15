@@ -3,7 +3,7 @@
  * Ejecutar: npm run seed:build
  */
 import { mkdirSync, writeFileSync } from "node:fs";
-import { courses, worlds, unlockOrder } from "../content/curriculum";
+import { courses, worlds } from "../content/curriculum";
 import type { Exercise } from "../content/courses/types";
 
 const q = (v: string) => `'${v.replace(/'/g, "''")}'`;
@@ -101,6 +101,7 @@ on conflict (unit_id, slug) do update set
 lines.push("");
 
 /* ----------------------------------------------- fila normalizada (opcional) */
+if (!process.env.SEED_NO_MIRROR) {
 lines.push("-- Espejo normalizado en public.exercises para analítica de aciertos.");
 for (const c of courses) {
   for (const u of c.units) {
@@ -119,15 +120,7 @@ and not exists (
     }
   }
 }
-lines.push("");
-
-/* ------------------------------------------------------------ ruta de desbloqueo */
-lines.push(
-  `-- Ruta recomendada (orden de lecciones).
-insert into public.app_config (key, value)
-values ('unlock_order', ${json(unlockOrder)})
-on conflict (key) do update set value = excluded.value;`,
-);
+}
 
 lines.push("");
 lines.push("commit;");
