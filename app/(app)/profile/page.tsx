@@ -2,7 +2,18 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Award, Flame, Gem, Heart, LogOut, Target, Zap, BookOpen, CreditCard, Sparkles } from "lucide-react";
+import {
+  Award,
+  Flame,
+  Gem,
+  Heart,
+  LogOut,
+  Target,
+  Zap,
+  BookOpen,
+  CreditCard,
+  Sparkles,
+} from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { curriculumStats } from "@/content/curriculum";
 import { daysToNextFreeze, leagueWindow } from "@/lib/progress";
@@ -22,99 +33,90 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <header className="card relative overflow-hidden p-5">
-        <div className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-violet-brand/20 blur-3xl" />
-        <div className="relative flex items-center gap-4">
+      <header className="border-2 border-ink bg-white p-4 shadow-hard sm:p-5">
+        <div className="flex items-center gap-3.5">
           <span
-            className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl text-xl font-black text-white shadow-lg"
-            style={{
-              background: `linear-gradient(140deg, hsl(${profile.avatarHue} 70% 55%), hsl(${(profile.avatarHue + 50) % 360} 70% 38%))`,
-            }}
+            className="grid h-16 w-16 shrink-0 place-items-center rounded-full border-2 border-ink font-display text-xl"
+            style={{ background: `hsl(${profile.avatarHue} 80% 76%)` }}
           >
             {profile.displayName.slice(0, 1).toUpperCase()}
           </span>
           <div className="min-w-0">
-            <h1 className="truncate text-xl font-black tracking-tight">{profile.displayName}</h1>
-            <p className="text-[12.5px] text-white/45">
+            <h1 className="truncate font-display text-[20px] uppercase leading-none tracking-tight">
+              {profile.displayName}
+            </h1>
+            <p className="mt-1 truncate text-[11.5px] font-semibold text-ink/55">
               {profile.email ?? "Sesión local"} · {mode === "demo" ? "modo demo" : "cuenta LEVELUP"}
             </p>
-            <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-              <span className="chip border-brand-400/30 bg-brand-500/10 text-brand-300">Nivel {level}</span>
-              <span className="chip border-orange-400/30 bg-orange-400/10 text-orange-300">
-                <Flame className="h-3 w-3" /> {profile.streak} días
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              <span className="chip chip-mint">Nivel {level}</span>
+              <span className="chip chip-yellow">
+                <Flame className="h-3 w-3" strokeWidth={3} /> {profile.streak} días
               </span>
-              {profile.isPro && <span className="chip border-amber-300/40 bg-amber-300/15 text-amber-200">PRO</span>}
+              {profile.isPro && <span className="chip chip-purple">PRO</span>}
             </div>
           </div>
         </div>
 
-        <div className="relative mt-4">
-          <div className="flex items-center justify-between text-[11px] font-bold text-white/40">
+        <div className="mt-4">
+          <div className="flex items-center justify-between text-[10px] font-extrabold uppercase">
             <span>Nivel {level}</span>
-            <span>
-              {intoLevel}/250 XP para nivel {level + 1}
-            </span>
+            <span className="tabular-nums">{intoLevel}/250 XP para nivel {level + 1}</span>
           </div>
-          <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-white/8">
-            <div className="h-full rounded-full bg-gradient-to-r from-violet-brand to-brand-400" style={{ width: `${(intoLevel / 250) * 100}%` }} />
+          <div className="progress mt-1.5">
+            <span style={{ width: `${(intoLevel / 250) * 100}%` }} />
           </div>
         </div>
       </header>
 
       <section className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-        <Metric icon={<Zap className="h-4 w-4 text-brand-400" />} value={profile.totalXp} label="XP total" />
-        <Metric icon={<Flame className="h-4 w-4 text-orange-400" />} value={profile.longestStreak} label="mejor racha" />
-        <Metric icon={<Gem className="h-4 w-4 text-sky-400" />} value={profile.gems} label="gemas" />
-        <Metric icon={<Heart className="h-4 w-4 text-rose-400" />} value={profile.streakFreezes} label="congeladores" />
+        <Metric icon={<Zap className="h-4 w-4" strokeWidth={2.8} />} value={profile.totalXp} label="XP total" bg="var(--color-yellow-brand)" />
+        <Metric icon={<Flame className="h-4 w-4" strokeWidth={2.8} />} value={profile.longestStreak} label="mejor racha" bg="var(--color-pink-brand)" />
+        <Metric icon={<Gem className="h-4 w-4" strokeWidth={2.8} />} value={profile.gems} label="gemas" bg="var(--color-purple-brand)" />
+        <Metric icon={<Heart className="h-4 w-4" strokeWidth={2.8} />} value={profile.streakFreezes} label="congeladores" bg="var(--color-mint-brand)" />
       </section>
 
-      <section className="card mt-4 p-4">
-        <h2 className="flex items-center gap-1.5 text-sm font-extrabold">
-          <Target className="h-4 w-4 text-brand-400" /> Progreso del currículo
+      <section className="mt-4 border-2 border-ink bg-white p-4 shadow-hard-sm">
+        <h2 className="flex items-center gap-1.5 font-display text-[13px] uppercase tracking-tight">
+          <Target className="h-4 w-4" strokeWidth={2.8} /> Progreso del currículo
         </h2>
         <div className="mt-3 flex items-center gap-4">
           <div className="relative grid h-20 w-20 shrink-0 place-items-center">
             <svg viewBox="0 0 36 36" className="h-20 w-20 -rotate-90">
-              <circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(255,255,255,0.09)" strokeWidth="3.5" />
+              <circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5dcc6" strokeWidth="4" />
               <circle
                 cx="18"
                 cy="18"
                 r="15.5"
                 fill="none"
-                stroke="url(#g)"
-                strokeWidth="3.5"
-                strokeLinecap="round"
+                stroke="#0b0b0b"
+                strokeWidth="4"
+                strokeLinecap="butt"
                 strokeDasharray={`${(pct / 100) * 97.4} 97.4`}
               />
-              <defs>
-                <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#22c55e" />
-                  <stop offset="100%" stopColor="#a5f3c6" />
-                </linearGradient>
-              </defs>
             </svg>
-            <span className="absolute text-[15px] font-black">{pct}%</span>
+            <span className="absolute font-display text-[14px]">{pct}%</span>
           </div>
-          <div className="min-w-0 flex-1 text-[12.5px] leading-relaxed text-white/55">
+          <div className="min-w-0 flex-1 text-[12.5px] font-medium leading-relaxed">
             <p>
-              <b className="text-white/85">{done}</b> de {curriculumStats.lessons} lecciones completadas.
+              <b className="font-extrabold">{done}</b> de {curriculumStats.lessons} lecciones completadas.
             </p>
             <p>
-              <b className="text-amber-200">{legendary}</b> legendarias (100% de acierto).
+              <b className="font-extrabold">{legendary}</b> legendarias (100% de acierto).
             </p>
             <p>
-              <b className="text-white/85">{profile.minutesPracticed}</b> minutos practicados.
+              <b className="font-extrabold">{profile.minutesPracticed}</b> minutos practicados.
             </p>
-            <p className="mt-1 text-white/35">
+            <p className="mt-1 text-ink/50">
               Próximo congelador de racha en {daysToNextFreeze(profile.streak)} días.
             </p>
           </div>
         </div>
       </section>
 
-      <section className="card mt-4 p-4">
-        <h2 className="flex items-center gap-1.5 text-sm font-extrabold">
-          <Award className="h-4 w-4 text-amber-300" /> Logros
+      <section className="mt-4 border-2 border-ink bg-white p-4 shadow-hard-sm">
+        <h2 className="flex items-center gap-1.5 font-display text-[13px] uppercase tracking-tight">
+          <Award className="h-4 w-4" strokeWidth={2.8} /> Logros
         </h2>
         <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6">
           {achievements.slice(0, 18).map((a) => {
@@ -129,44 +131,50 @@ export default function ProfilePage() {
               <div
                 key={a.slug}
                 title={`${a.name}: ${a.description}`}
-                className={`flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border px-1 text-center ${
-                  unlocked ? "border-white/15 bg-white/[0.07]" : "border-white/8 bg-white/[0.02] opacity-40"
+                className={`flex aspect-square flex-col items-center justify-center gap-1 border-2 border-ink px-1 text-center ${
+                  unlocked ? "bg-yellow-brand" : "bg-cream-200 opacity-55"
                 }`}
               >
                 <span className="text-lg leading-none">{a.emoji}</span>
-                <span className="line-clamp-2 text-[8.5px] font-bold uppercase leading-tight text-white/60">{a.name}</span>
+                <span className="line-clamp-2 text-[8px] font-extrabold uppercase leading-tight">
+                  {a.name}
+                </span>
               </div>
             );
           })}
         </div>
-        <p className="mt-2.5 text-[11px] text-white/30">
-          {achievements.filter((a) => tierColor(a.tier)).length} logros definidos en el catálogo · los bloqueados se
-          desbloquean con progreso real.
+        <p className="mt-2.5 text-[10.5px] font-semibold text-ink/50">
+          {achievements.filter((a) => tierColor(a.tier)).length} logros definidos en el catálogo · los
+          bloqueados se desbloquean con progreso real.
         </p>
       </section>
 
-      <section className="card mt-4 p-4">
-        <h2 className="flex items-center gap-1.5 text-sm font-extrabold">
-          <CreditCard className="h-4 w-4 text-brand-400" /> Plan
+      <section className="mt-4 border-2 border-ink bg-white p-4 shadow-hard-sm">
+        <h2 className="flex items-center gap-1.5 font-display text-[13px] uppercase tracking-tight">
+          <CreditCard className="h-4 w-4" strokeWidth={2.8} /> Plan
         </h2>
-        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3.5">
+        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-3 border-2 border-ink bg-cream-200 p-3">
           <div>
-            <p className="text-[13.5px] font-extrabold">{profile.isPro ? "LEVELUP PRO" : "Plan gratuito"}</p>
-            <p className="text-[11.5px] text-white/45">
-              {profile.isPro ? "Corazones ilimitados y cursos premium." : "12,99 €/mes o 79 €/año · cancela cuando quieras"}
+            <p className="text-[13px] font-extrabold uppercase">
+              {profile.isPro ? "LEVELUP PRO" : "Plan gratuito"}
+            </p>
+            <p className="text-[11.5px] font-semibold text-ink/60">
+              {profile.isPro
+                ? "Corazones ilimitados y cursos premium."
+                : "12,99 €/mes o 79 €/año · cancela cuando quieras"}
             </p>
           </div>
           {!profile.isPro && (
-            <Link href="/pro" className="btn btn-primary px-4 py-2.5 text-[13px]">
-              <Sparkles className="h-4 w-4" /> Ver PRO
+            <Link href="/pro" className="btn btn-primary px-4 py-2.5 text-[12px]">
+              <Sparkles className="h-4 w-4" strokeWidth={2.8} /> Ver PRO
             </Link>
           )}
         </div>
       </section>
 
       <section className="mt-4 grid gap-2">
-        <Link href="/courses" className="btn btn-ghost justify-start px-4 py-3 text-[13.5px]">
-          <BookOpen className="h-4 w-4" /> Explorar los {curriculumStats.courses} cursos
+        <Link href="/courses" className="btn btn-ghost justify-start px-4 py-3 text-[13px]">
+          <BookOpen className="h-4 w-4" strokeWidth={2.8} /> Explorar los {curriculumStats.courses} cursos
         </Link>
         {mode !== "demo" && (
           <button
@@ -174,28 +182,38 @@ export default function ProfilePage() {
               await signOut();
               router.push("/signin");
             }}
-            className="btn btn-ghost justify-start px-4 py-3 text-[13.5px] text-rose-300"
+            className="btn btn-ghost justify-start px-4 py-3 text-[13px]"
           >
-            <LogOut className="h-4 w-4" /> Cerrar sesión
+            <LogOut className="h-4 w-4" strokeWidth={2.8} /> Cerrar sesión
           </button>
         )}
       </section>
 
-      <p className="mt-4 text-center text-[10.5px] text-white/25">
+      <p className="mt-4 text-center text-[10px] font-extrabold uppercase text-ink/40">
         Semana {win.weekKey} · reinicio en {Math.floor(win.secondsLeft / 86400)}d
       </p>
     </div>
   );
 }
 
-function Metric({ icon, value, label }: { icon: React.ReactNode; value: number; label: string }) {
+function Metric({
+  icon,
+  value,
+  label,
+  bg,
+}: {
+  icon: React.ReactNode;
+  value: number;
+  label: string;
+  bg: string;
+}) {
   return (
-    <div className="card-tight px-2.5 py-2.5 text-center">
-      <p className="flex items-center justify-center gap-1 text-[15px] font-black tabular-nums">
+    <div className="border-2 border-ink px-2 py-2 text-center shadow-hard-sm" style={{ background: bg }}>
+      <p className="flex items-center justify-center gap-1 text-[15px] font-extrabold tabular-nums">
         {icon}
         {value}
       </p>
-      <p className="text-[9.5px] font-bold uppercase tracking-wider text-white/40">{label}</p>
+      <p className="text-[9px] font-extrabold uppercase tracking-wide">{label}</p>
     </div>
   );
 }

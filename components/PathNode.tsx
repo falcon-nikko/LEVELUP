@@ -13,58 +13,64 @@ type Props = {
   isNext: boolean;
 };
 
-export function PathNode({ id, title, index, state, xp, courseColor, isNext }: Props) {
-  const offset = [0, 34, 58, 34, 0, -34, -58, -34][index % 8];
+const offsets = [0, 34, 58, 34, 0, -34, -58, -34];
 
+export function PathNode({ id, title, index, state, xp, courseColor, isNext }: Props) {
+  const offset = offsets[index % 8];
   const locked = state === "locked";
 
   const inner = (
-    <div className="group relative flex flex-col items-center" style={{ transform: `translateX(${offset}px)` }}>
+    <div
+      className="group relative flex flex-col items-center"
+      style={{ transform: `translateX(${offset}px)` }}
+    >
       <span
-        className={`relative grid h-[68px] w-[68px] place-items-center rounded-full border-2 transition ${
+        className={`relative grid h-[66px] w-[66px] place-items-center rounded-full border-2 border-ink transition ${
           state === "done"
-            ? "border-brand-300/60 bg-gradient-to-b from-brand-400 to-brand-600 shadow-[0_10px_26px_-10px_rgba(34,197,94,0.8)]"
+            ? "bg-mint-brand shadow-hard-sm"
             : isNext
-              ? "border-brand-300 bg-ink-850 shadow-[0_0_0_6px_rgba(34,197,94,0.14)]"
+              ? "bg-yellow-brand shadow-hard"
               : locked
-                ? "border-white/10 bg-ink-850/80"
-                : "border-white/20 bg-ink-850"
+                ? "bg-cream-200 text-ink/30"
+                : "bg-white shadow-hard-sm"
         }`}
-        style={
-          isNext
-            ? { boxShadow: `0 0 0 6px ${courseColor}22, 0 10px 30px -12px ${courseColor}` }
-            : undefined
-        }
+        style={isNext ? { boxShadow: `5px 5px 0 0 #0b0b0b, 0 0 0 5px ${courseColor}55` } : undefined}
       >
         {state === "done" ? (
-          <Check className="h-7 w-7 text-ink-950" strokeWidth={3.2} />
+          <Check className="h-7 w-7" strokeWidth={4} />
         ) : state === "legendary" ? (
-          <Star className="h-6 w-6 text-ink-950" strokeWidth={2.6} />
+          <Star className="h-6 w-6 fill-ink" strokeWidth={2.6} />
         ) : locked ? (
-          <Lock className="h-5 w-5 text-white/25" />
+          <Lock className="h-5 w-5" strokeWidth={2.8} />
         ) : (
-          <Play className="h-6 w-6 fill-brand-300 text-brand-300" />
+          <Play className="h-6 w-6 fill-ink" strokeWidth={0} />
         )}
         {isNext && (
-          <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-brand-400 px-2 py-0.5 text-[9.5px] font-black uppercase tracking-wide text-ink-950">
+          <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap border-2 border-ink bg-ink px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wide text-cream">
             Empezar
           </span>
         )}
       </span>
       <span
-        className={`mt-2 max-w-[150px] text-center text-[11.5px] font-bold leading-tight ${
-          locked ? "text-white/30" : "text-white/80"
+        className={`mt-2 max-w-[140px] rounded px-1 text-center text-[11.5px] font-bold leading-tight ${
+          locked ? "text-ink/35" : "text-ink"
         }`}
       >
         {title}
       </span>
-      {!locked && <span className="mt-0.5 text-[10px] font-bold text-brand-400/70">+{xp} XP</span>}
+      {!locked && (
+        <span className="mt-0.5 text-[10px] font-extrabold uppercase text-ink/50">+{xp} XP</span>
+      )}
     </div>
   );
 
-  if (locked) return <div className="cursor-not-allowed opacity-90">{inner}</div>;
+  if (locked) return <div className="cursor-not-allowed">{inner}</div>;
   return (
-    <Link href={`/learn/${id}`} className="block transition hover:scale-[1.03]" aria-label={`Lección: ${title}`}>
+    <Link
+      href={`/learn/${id}`}
+      className="block transition-transform hover:-translate-y-0.5"
+      aria-label={`Lección: ${title}`}
+    >
       {inner}
     </Link>
   );

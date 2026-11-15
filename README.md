@@ -20,6 +20,16 @@ cada lección.
 Funciona **sin configurar nada**: arranca en modo demo con el progreso guardado en el navegador.
 Con credenciales de Supabase se activan cuentas reales, XP atómico en servidor y ligas.
 
+## Diseño
+
+Estética **neo-brutalista**: fondo crema (`#fdf9f0`), bordes negros de 2px, sombras duras sin blur y
+tres acentos —amarillo `#e2fa32`, lila `#c9a8f5` y menta `#a7e8c4`—. Tipografía display *Archivo
+Black* para titulares, *Inter* para texto. Los tokens viven en `app/globals.css` (`@theme`):
+`bg-cream`, `bg-yellow-brand`, `bg-purple-brand`, `bg-mint-brand`, `border-ink`, `shadow-hard`.
+
+Clases base: `.card` / `.card-tight` (superficie con borde y sombra), `.btn` + `.btn-primary` /
+`.btn-purple` / `.btn-mint` / `.btn-ghost` (los botones se hunden al pulsar), `.chip`, `.progress`.
+
 ## Arrancar
 
 ```bash

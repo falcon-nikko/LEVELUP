@@ -14,7 +14,11 @@ type Props = {
 };
 
 export function ExerciseView({ exercise, answer, onChange, locked, correct }: Props) {
-  if (exercise.type === "multiple_choice" || exercise.type === "true_false" || exercise.type === "simulation") {
+  if (
+    exercise.type === "multiple_choice" ||
+    exercise.type === "true_false" ||
+    exercise.type === "simulation"
+  ) {
     return (
       <Choices
         exercise={exercise}
@@ -87,36 +91,36 @@ function Choices({
             type="button"
             onClick={() => onPick(selected ? null : opt.id)}
             disabled={locked}
-            className={`group flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left text-[15px] font-semibold transition ${
+            className={`flex items-center gap-3 border-2 border-ink px-3.5 py-3 text-left text-[14.5px] font-semibold transition ${
               showRight
-                ? "border-brand-400/60 bg-brand-500/15 text-brand-300"
+                ? "bg-mint-brand shadow-hard-sm"
                 : showWrong
-                  ? "border-rose-400/50 bg-rose-500/10 text-rose-200"
+                  ? "bg-pink-brand shadow-hard-sm"
                   : selected
-                    ? "border-brand-400/50 bg-brand-500/10 text-white"
-                    : "border-white/10 bg-white/[0.04] text-white/85 hover:border-white/25 hover:bg-white/[0.07]"
+                    ? "bg-purple-brand shadow-hard-sm"
+                    : "bg-white hover:-translate-y-0.5 hover:shadow-hard-sm"
             } ${locked ? "cursor-default" : "cursor-pointer"}`}
           >
             <span
-              className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg border text-xs font-black ${
-                showRight
-                  ? "border-brand-400/60 bg-brand-500 text-ink-950"
-                  : showWrong
-                    ? "border-rose-400/60 bg-rose-500 text-white"
-                    : selected
-                      ? "border-brand-400/60 bg-brand-500/25 text-brand-200"
-                      : "border-white/15 text-white/50"
+              className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border-2 border-ink text-xs font-extrabold ${
+                showRight ? "bg-mint-brand" : showWrong ? "bg-pink-brand" : selected ? "bg-purple-brand" : "bg-cream-200"
               }`}
             >
-              {showRight ? <Check className="h-4 w-4" /> : showWrong ? <X className="h-4 w-4" /> : opt.id.toUpperCase()}
+              {showRight ? (
+                <Check className="h-4 w-4" strokeWidth={4} />
+              ) : showWrong ? (
+                <X className="h-4 w-4" strokeWidth={4} />
+              ) : (
+                opt.id.toUpperCase()
+              )}
             </span>
             <span className="leading-snug">{opt.text}</span>
           </button>
         );
       })}
       {correct === false && (
-        <div className="col-span-full mt-1 rounded-xl border border-amber-400/25 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
-          <b>Ojo:</b> {exercise.explanation}
+        <div className="col-span-full mt-1 border-2 border-ink bg-yellow-brand px-3.5 py-3 text-[13px] font-medium shadow-hard-sm">
+          <b className="font-extrabold uppercase">Ojo:</b> {exercise.explanation}
         </div>
       )}
     </div>
@@ -139,7 +143,9 @@ function MultiChoices({
   const expected = (exercise.correct.values as string[]) ?? [];
   return (
     <div className="grid gap-2.5">
-      <p className="text-xs font-bold uppercase tracking-wider text-white/40">Selecciona todas las correctas</p>
+      <p className="text-[10px] font-extrabold uppercase tracking-wider text-ink/55">
+        Selecciona todas las correctas
+      </p>
       {(exercise.options ?? []).map((opt) => {
         const selected = values.includes(opt.id);
         const isRight = expected.includes(opt.id);
@@ -149,30 +155,30 @@ function MultiChoices({
             type="button"
             disabled={locked}
             onClick={() => onChange(selected ? values.filter((v) => v !== opt.id) : [...values, opt.id])}
-            className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left text-[15px] font-semibold transition ${
+            className={`flex items-center gap-3 border-2 border-ink px-3.5 py-3 text-left text-[14.5px] font-semibold transition ${
               locked && isRight
-                ? "border-brand-400/60 bg-brand-500/15"
+                ? "bg-mint-brand"
                 : locked && selected && !isRight
-                  ? "border-rose-400/50 bg-rose-500/10"
+                  ? "bg-pink-brand"
                   : selected
-                    ? "border-brand-400/50 bg-brand-500/10"
-                    : "border-white/10 bg-white/[0.04] hover:border-white/25"
+                    ? "bg-purple-brand shadow-hard-sm"
+                    : "bg-white hover:-translate-y-0.5 hover:shadow-hard-sm"
             }`}
           >
             <span
-              className={`grid h-5 w-5 shrink-0 place-items-center rounded border ${
-                selected ? "border-brand-400 bg-brand-500 text-ink-950" : "border-white/25"
+              className={`grid h-5 w-5 shrink-0 place-items-center border-2 border-ink ${
+                selected ? "bg-ink text-cream" : "bg-white"
               }`}
             >
-              {selected && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+              {selected && <Check className="h-3.5 w-3.5" strokeWidth={4} />}
             </span>
             {opt.text}
           </button>
         );
       })}
       {correct === false && (
-        <div className="rounded-xl border border-amber-400/25 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
-          <b>Ojo:</b> {exercise.explanation}
+        <div className="border-2 border-ink bg-yellow-brand px-3.5 py-3 text-[13px] font-medium shadow-hard-sm">
+          <b className="font-extrabold uppercase">Ojo:</b> {exercise.explanation}
         </div>
       )}
     </div>
@@ -193,7 +199,9 @@ function Ordering({
   correct: boolean | null;
 }) {
   const options = exercise.options ?? [];
-  const [pool, setPool] = useState<string[]>(() => options.map((o) => o.id).filter((id) => !order.includes(id)));
+  const [pool, setPool] = useState<string[]>(() =>
+    options.map((o) => o.id).filter((id) => !order.includes(id)),
+  );
 
   useEffect(() => {
     setPool(options.map((o) => o.id).filter((id) => !order.includes(id)));
@@ -204,11 +212,15 @@ function Ordering({
 
   return (
     <div className="grid gap-3">
-      <p className="text-xs font-bold uppercase tracking-wider text-white/40">
+      <p className="text-[10px] font-extrabold uppercase tracking-wider text-ink/55">
         Toca en el orden correcto · {order.length}/{options.length}
       </p>
-      <div className="min-h-[68px] rounded-xl border border-dashed border-white/15 bg-white/[0.03] p-2">
-        {order.length === 0 && <p className="px-2 py-4 text-center text-sm text-white/35">Aún no has elegido nada</p>}
+      <div className="min-h-[68px] border-2 border-dashed border-ink bg-cream-200 p-2">
+        {order.length === 0 && (
+          <p className="px-2 py-4 text-center text-[13px] font-semibold text-ink/45">
+            Aún no has elegido nada
+          </p>
+        )}
         <div className="grid gap-2">
           {order.map((id, i) => {
             const ok = locked && expected[i] === id;
@@ -219,11 +231,11 @@ function Ordering({
                 type="button"
                 disabled={locked}
                 onClick={() => onChange(order.filter((x) => x !== id))}
-                className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left text-sm font-semibold ${
-                  ok ? "border-brand-400/60 bg-brand-500/15" : bad ? "border-rose-400/50 bg-rose-500/10" : "border-white/12 bg-white/[0.06]"
+                className={`flex items-center gap-3 border-2 border-ink px-3 py-2.5 text-left text-[13px] font-semibold ${
+                  ok ? "bg-mint-brand" : bad ? "bg-pink-brand" : "bg-white"
                 }`}
               >
-                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-white/10 text-[11px] font-black">
+                <span className="grid h-6 w-6 shrink-0 place-items-center border-2 border-ink bg-yellow-brand text-[11px] font-extrabold">
                   {i + 1}
                 </span>
                 {label(id)}
@@ -240,7 +252,7 @@ function Ordering({
               type="button"
               disabled={locked}
               onClick={() => onChange([...order, id])}
-              className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2.5 text-left text-sm font-semibold text-white/85 hover:border-white/25 hover:bg-white/[0.08]"
+              className="border-2 border-ink bg-white px-3 py-2.5 text-left text-[13px] font-semibold transition hover:-translate-y-0.5 hover:shadow-hard-sm"
             >
               {label(id)}
             </button>
@@ -248,8 +260,8 @@ function Ordering({
         </div>
       )}
       {correct === false && (
-        <div className="rounded-xl border border-amber-400/25 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
-          <b>Secuencia correcta:</b> {expected.map(label).join(" → ")}
+        <div className="border-2 border-ink bg-yellow-brand px-3.5 py-3 text-[13px] font-medium shadow-hard-sm">
+          <b className="font-extrabold uppercase">Secuencia correcta:</b> {expected.map(label).join(" → ")}
         </div>
       )}
     </div>
@@ -278,19 +290,19 @@ function TextAnswer({
         onChange={(e) => onChange(e.target.value)}
         disabled={locked}
         placeholder="Escribe tu respuesta…"
-        className={`w-full rounded-xl border bg-white/[0.04] px-4 py-3.5 text-[15px] font-semibold outline-none transition placeholder:text-white/30 ${
+        className={`w-full border-2 border-ink px-3.5 py-3.5 text-[15px] font-semibold outline-none transition placeholder:text-ink/30 ${
           correct === true
-            ? "border-brand-400/60 text-brand-200"
+            ? "bg-mint-brand"
             : correct === false
-              ? "border-rose-400/50 text-rose-200"
-              : "border-white/12 focus:border-brand-400/60"
+              ? "bg-pink-brand"
+              : "bg-white focus:shadow-hard-sm"
         }`}
       />
       {correct === false && (
-        <div className="rounded-xl border border-amber-400/25 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
-          <b>Respuesta esperada:</b> {hint}
+        <div className="border-2 border-ink bg-yellow-brand px-3.5 py-3 text-[13px] font-medium shadow-hard-sm">
+          <b className="font-extrabold uppercase">Respuesta esperada:</b> {hint}
           <br />
-          <span className="text-amber-100/80">{exercise.explanation}</span>
+          <span className="text-ink/75">{exercise.explanation}</span>
         </div>
       )}
     </div>

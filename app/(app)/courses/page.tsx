@@ -18,8 +18,8 @@ export default function CoursesPage() {
   return (
     <div>
       <header className="mb-4">
-        <h1 className="text-2xl font-black tracking-tight">Catálogo</h1>
-        <p className="mt-1 text-sm text-white/55">
+        <h1 className="font-display text-[26px] uppercase leading-none tracking-tight">Catálogo</h1>
+        <p className="mt-2 text-[12.5px] font-semibold text-ink/60">
           {courses.length} cursos · {profile.completedLessonSlugs.length} lecciones completadas
         </p>
       </header>
@@ -27,63 +27,80 @@ export default function CoursesPage() {
       <div className="mb-5 flex flex-wrap gap-2">
         <FilterPill active={world === "all"} onClick={() => setWorld("all")} label="Todo" />
         {worlds.map((w) => (
-          <FilterPill key={w.slug} active={world === w.slug} onClick={() => setWorld(w.slug)} label={w.name} color={w.color} />
+          <FilterPill
+            key={w.slug}
+            active={world === w.slug}
+            onClick={() => setWorld(w.slug)}
+            label={w.name}
+            color={w.color}
+          />
         ))}
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3.5 sm:grid-cols-2">
         {visible.map((c) => {
           const w = worlds.find((x) => x.slug === c.world)!;
           const Icon = icons[c.world];
           const cp = courseProgress(c.slug, profile.completedLessonSlugs);
           const first = c.units[0].lessons[0].id;
-          const minutes = c.units.reduce((n, u) => n + u.lessons.reduce((m, l) => m + l.minutes, 0), 0);
+          const minutes = c.units.reduce(
+            (n, u) => n + u.lessons.reduce((m, l) => m + l.minutes, 0),
+            0,
+          );
           const lessonCount = c.units.reduce((n, u) => n + u.lessons.length, 0);
 
           return (
-            <Link key={c.slug} href={`/learn/${first}`} className="card group flex flex-col p-4 transition hover:border-white/20">
+            <Link
+              key={c.slug}
+              href={`/learn/${first}`}
+              className="group flex flex-col border-2 border-ink bg-white p-4 shadow-hard transition-transform hover:-translate-y-0.5"
+            >
               <div className="flex items-start gap-2.5">
                 <span
-                  className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl"
-                  style={{ background: `${w.color}22`, border: `1px solid ${w.color}44` }}
+                  className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center border-2 border-ink"
+                  style={{ background: `${w.color}66` }}
                 >
-                  <Icon className="h-4 w-4" style={{ color: w.color }} />
+                  <Icon className="h-4 w-4" strokeWidth={2.8} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: w.color }}>
+                  <p className="text-[9.5px] font-extrabold uppercase tracking-[0.12em] text-ink/55">
                     {w.name} · {c.level}
                   </p>
-                  <h3 className="text-[15px] font-extrabold leading-tight">{c.title}</h3>
+                  <h3 className="font-display text-[14.5px] uppercase leading-tight tracking-tight">
+                    {c.title}
+                  </h3>
                 </div>
               </div>
 
-              <p className="mt-2.5 text-[13px] leading-snug text-white/55">{c.shortDescription}</p>
-
-              <p className="mt-2.5 rounded-lg border border-white/8 bg-white/[0.03] px-2.5 py-2 text-[11.5px] leading-snug text-white/50">
-                <b className="text-white/70">Resultado:</b> {c.outcome}
+              <p className="mt-2.5 text-[12.5px] font-medium leading-snug text-ink/70">
+                {c.shortDescription}
               </p>
 
-              <div className="mt-3 flex items-center gap-3 text-[11px] font-bold text-white/40">
+              <p className="mt-2.5 border-2 border-ink bg-cream-200 px-2.5 py-2 text-[11.5px] font-medium leading-snug">
+                <b className="font-extrabold uppercase">Resultado:</b> {c.outcome}
+              </p>
+
+              <div className="mt-3 flex items-center gap-3 text-[10.5px] font-extrabold uppercase">
                 <span className="flex items-center gap-1">
-                  <Layers className="h-3.5 w-3.5" /> {lessonCount}
+                  <Layers className="h-3.5 w-3.5" strokeWidth={2.8} /> {lessonCount}
                 </span>
                 <span className="flex items-center gap-1">
-                  <Clock className="h-3.5 w-3.5" /> {minutes} min
+                  <Clock className="h-3.5 w-3.5" strokeWidth={2.8} /> {minutes} min
                 </span>
               </div>
 
               <div className="mt-auto pt-3">
-                <div className="flex items-center justify-between text-[10.5px] font-bold text-white/35">
-                  <span>
+                <div className="flex items-center justify-between text-[10.5px] font-extrabold uppercase">
+                  <span className="tabular-nums">
                     {cp.done}/{cp.total}
                   </span>
-                  <span className="flex items-center gap-1 text-brand-400/80 group-hover:text-brand-300">
+                  <span className="flex items-center gap-1">
                     {cp.pct === 100 ? "Repasar" : cp.done > 0 ? "Continuar" : "Empezar"}
-                    <ArrowRight className="h-3 w-3" />
+                    <ArrowRight className="h-3 w-3" strokeWidth={3} />
                   </span>
                 </div>
-                <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/8">
-                  <div className="h-full rounded-full" style={{ width: `${Math.max(2, cp.pct)}%`, background: w.color }} />
+                <div className="progress mt-1.5 h-2">
+                  <span style={{ width: `${Math.max(2, cp.pct)}%` }} />
                 </div>
               </div>
             </Link>
@@ -108,10 +125,10 @@ function FilterPill({
   return (
     <button
       onClick={onClick}
-      className={`rounded-full border px-3 py-1.5 text-[12px] font-bold transition ${
-        active ? "border-white/25 bg-white/12 text-white" : "border-white/10 bg-white/[0.03] text-white/50 hover:text-white/80"
+      className={`border-2 border-ink px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-wide transition ${
+        active ? "shadow-hard-sm" : "bg-white hover:bg-cream-200"
       }`}
-      style={active && color ? { borderColor: `${color}66`, background: `${color}22` } : undefined}
+      style={active ? { background: color ? `${color}88` : "var(--color-yellow-brand)" } : undefined}
     >
       {label}
     </button>

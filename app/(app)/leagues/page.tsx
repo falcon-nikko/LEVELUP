@@ -67,42 +67,44 @@ export default function LeaguesPage() {
     <div className="mx-auto max-w-2xl">
       <header className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <h1 className="flex items-center gap-2 text-2xl font-black tracking-tight">
-            <Trophy className="h-6 w-6 text-amber-300" /> Liga semanal
+          <h1 className="flex items-center gap-2 font-display text-[26px] uppercase leading-none tracking-tight">
+            <Trophy className="h-6 w-6" strokeWidth={2.6} /> Liga semanal
           </h1>
-          <p className="mt-1 text-sm text-white/55">Suben los 10 primeros. El lunes se reinicia.</p>
+          <p className="mt-2 text-[12.5px] font-semibold text-ink/60">
+            Suben los 10 primeros. El lunes se reinicia.
+          </p>
         </div>
-        <div className="card-tight shrink-0 px-3 py-2 text-center">
-          <p className="flex items-center gap-1 text-[13px] font-black tabular-nums">
-            <Timer className="h-3.5 w-3.5 text-white/40" />
+        <div className="shrink-0 border-2 border-ink bg-yellow-brand px-2.5 py-1.5 text-center shadow-hard-sm">
+          <p className="flex items-center gap-1 text-[13px] font-extrabold tabular-nums">
+            <Timer className="h-3.5 w-3.5" strokeWidth={2.8} />
             {formatCountdown(win.secondsLeft)}
           </p>
-          <p className="text-[9.5px] font-bold uppercase tracking-wider text-white/35">restante</p>
+          <p className="text-[9px] font-extrabold uppercase tracking-wide">restante</p>
         </div>
       </header>
 
       {self && (
-        <div className="card mb-4 flex items-center gap-3 border-brand-400/30 bg-brand-500/[0.07] p-3.5">
+        <div className="mb-4 flex items-center gap-3 border-2 border-ink bg-mint-brand p-3.5 shadow-hard">
           <RankBadge rank={self.rank} />
           <div className="min-w-0 flex-1">
             <p className="truncate text-[14px] font-extrabold">{self.displayName} (tú)</p>
-            <p className="text-[11.5px] text-white/50">
+            <p className="text-[11.5px] font-semibold">
               {self.weeklyXp} XP esta semana · total {self.totalXp} XP
             </p>
           </div>
           {self.rank <= 10 ? (
-            <span className="chip border-brand-400/40 bg-brand-500/15 text-brand-300">Zona de ascenso</span>
+            <span className="chip chip-yellow">Zona de ascenso</span>
           ) : (
-            <span className="chip border-white/10 text-white/50">A {(self.weeklyXp - (rows[9]?.weeklyXp ?? 0)) > 0 ? "asegurar" : "por subir"}</span>
+            <span className="chip">A {(self.weeklyXp - (rows[9]?.weeklyXp ?? 0)) > 0 ? "asegurar" : "por subir"}</span>
           )}
         </div>
       )}
 
-      <div className="card divide-y divide-white/[0.06] overflow-hidden">
+      <div className="overflow-hidden border-2 border-ink bg-white shadow-hard">
         {loading && (
           <div className="space-y-2 p-3">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="skeleton h-12 rounded-lg" />
+              <div key={i} className="skeleton h-12 border-2 border-ink" />
             ))}
           </div>
         )}
@@ -111,13 +113,15 @@ export default function LeaguesPage() {
           rows.map((r) => (
             <div
               key={r.userId}
-              className={`flex items-center gap-3 px-3.5 py-2.5 ${r.isSelf ? "bg-brand-500/[0.08]" : ""}`}
+              className={`flex items-center gap-3 border-b-2 border-ink px-3 py-2.5 last:border-b-0 ${
+                r.isSelf ? "bg-yellow-brand" : ""
+              }`}
             >
               <RankBadge rank={r.rank} />
               <span
-                className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-[12px] font-black text-white"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full border-2 border-ink text-[12px] font-black"
                 style={{
-                  background: `linear-gradient(140deg, hsl(${r.avatarHue} 70% 55%), hsl(${(r.avatarHue + 40) % 360} 70% 40%))`,
+                  background: `hsl(${r.avatarHue} 78% 78%)`,
                 }}
               >
                 {initials(r.displayName)}
@@ -125,9 +129,9 @@ export default function LeaguesPage() {
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[13.5px] font-bold">
                   {r.displayName}
-                  {r.isSelf && <span className="ml-1 text-brand-400">· tú</span>}
+                  {r.isSelf && <span className="ml-1 font-extrabold uppercase">· tú</span>}
                 </p>
-                <p className="flex items-center gap-2 text-[11px] text-white/40">
+                <p className="flex items-center gap-2 text-[11px] font-semibold text-ink/55">
                   <span className="flex items-center gap-0.5">
                     <TrendingUp className="h-3 w-3" />
                     {r.weeklyXp} XP
@@ -137,20 +141,22 @@ export default function LeaguesPage() {
               </div>
               <div className="shrink-0 text-right">
                 <p className="text-[13px] font-black tabular-nums">{r.totalXp}</p>
-                <p className="text-[9.5px] font-bold uppercase tracking-wider text-white/30">total</p>
+                <p className="text-[9px] font-extrabold uppercase tracking-wide text-ink/45">total</p>
               </div>
-              {r.rank === 1 && <Crown className="h-4 w-4 shrink-0 text-amber-300" />}
+              {r.rank === 1 && <Crown className="h-4 w-4 shrink-0" strokeWidth={2.8} />}
             </div>
           ))}
 
         {!loading && rows.length === 0 && (
-          <p className="p-8 text-center text-sm text-white/40">Aún no hay nadie en la liga esta semana.</p>
+          <p className="p-8 text-center text-[13px] font-semibold text-ink/55">
+            Aún no hay nadie en la liga esta semana.
+          </p>
         )}
       </div>
 
-      <div className="card mt-4 flex items-center gap-3 p-4">
-        <Users className="h-5 w-5 shrink-0 text-white/40" />
-        <p className="text-[12.5px] leading-snug text-white/55">
+      <div className="mt-4 flex items-center gap-3 border-2 border-ink bg-cream-200 p-3.5 shadow-hard-sm">
+        <Users className="h-5 w-5 shrink-0" strokeWidth={2.6} />
+        <p className="text-[12px] font-semibold leading-snug">
           {win.memberCount} participantes esta semana · Semana {win.weekKey}. Los 10 primeros ascienden de liga el
           lunes a las 00:00 UTC.
         </p>
@@ -162,7 +168,7 @@ export default function LeaguesPage() {
 function RankBadge({ rank }: { rank: number }) {
   const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : null;
   return (
-    <span className="grid w-7 shrink-0 place-items-center text-[13px] font-black tabular-nums text-white/50">
+    <span className="grid w-7 shrink-0 place-items-center text-[13px] font-extrabold tabular-nums">
       {medal ?? rank}
     </span>
   );
