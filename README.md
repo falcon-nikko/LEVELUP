@@ -5,6 +5,7 @@ lecciones de 5 minutos. En español, sin promesas de ingresos y con una acción 
 cada lección.
 
 - **Plan de negocio completo:** [`docs/PLAN-LEVELUP.md`](docs/PLAN-LEVELUP.md)
+- **Traspaso a otro agente / Claude Code:** [`BRIEF_CLAUDE_CODE.md`](BRIEF_CLAUDE_CODE.md)
 - **App en vivo:** `npm run dev` → http://localhost:3000
 
 ## Estado
